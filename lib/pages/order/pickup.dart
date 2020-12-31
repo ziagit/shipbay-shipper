@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shipbay/pages/shared/progress.dart';
+import 'package:google_maps_webservice/places.dart';
+import 'package:flutter_google_places/flutter_google_places.dart';
 
 class Pickup extends StatefulWidget {
   @override
@@ -7,6 +9,15 @@ class Pickup extends StatefulWidget {
 }
 
 class _PickupState extends State<Pickup> {
+  _google() async {
+    Prediction prediction = await PlacesAutocomplete.show(
+        context: context,
+        apiKey: "AIzaSyAQTHaD2g0BjmczBlX73Vv-KthtHzdRYPk",
+        mode: Mode.fullscreen, // Mode.overlay
+        language: "en",
+        components: [Component(Component.country, "pk")]);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,19 +85,15 @@ class _PickupState extends State<Pickup> {
                       ),
                     ],
                   ),
-                  RaisedButton(
-                    color: Colors.orange[900],
-                    child: Text(
-                      "Continue",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(30.0)),
+                  FloatingActionButton(
+                    heroTag: 1,
+                    backgroundColor: Colors.orange[900],
+                    child: Icon(Icons.keyboard_arrow_right),
                     onPressed: () {
                       Navigator.pushReplacementNamed(
                           context, '/pickup-services');
                     },
-                  )
+                  ),
                 ],
               ),
             ),

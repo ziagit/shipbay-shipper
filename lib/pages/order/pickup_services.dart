@@ -27,7 +27,7 @@ class _PickupServicesState extends State<PickupServices> {
               child: Column(
                 children: <Widget>[
                   Text(
-                    "Shipment services",
+                    "Pickup services",
                     style: TextStyle(fontSize: 24.0, height: 2.0),
                   ),
                   Row(
@@ -57,18 +57,30 @@ class _PickupServicesState extends State<PickupServices> {
                       ),
                     ],
                   ),
-                  RaisedButton(
-                    color: Colors.orange[900],
-                    child: Text(
-                      "Continue",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(30.0)),
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/pickup-date');
-                    },
-                  )
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      FloatingActionButton(
+                        heroTag: 0,
+                        backgroundColor: Colors.orange[50],
+                        foregroundColor: Colors.orange[900],
+                        child: Icon(Icons.keyboard_arrow_left),
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(context, '/pickup');
+                        },
+                      ),
+                      SizedBox(width: 12.0),
+                      FloatingActionButton(
+                        heroTag: 1,
+                        backgroundColor: Colors.orange[900],
+                        child: Icon(Icons.keyboard_arrow_right),
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(
+                              context, '/pickup-date');
+                        },
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
