@@ -20,19 +20,19 @@ class _DeliveryState extends State<Delivery> {
         child: Center(
             child: Column(
           children: <Widget>[
-            SizedBox(
-              child: Progress(),
-            ),
+            SizedBox(child: Progress()),
             SizedBox(
               child: Column(
                 children: <Widget>[
                   Text(
-                    "Shipment destination",
+                    "Delivery address",
                     style: TextStyle(fontSize: 24.0, height: 2.0),
                   ),
+                  SizedBox(height: 16.0),
                   TextFormField(
                     decoration: InputDecoration(hintText: 'Postal code'),
                   ),
+                  SizedBox(height: 24.0),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
@@ -74,6 +74,7 @@ class _DeliveryState extends State<Delivery> {
                       ),
                     ],
                   ),
+                  SizedBox(height: 24.0),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
@@ -87,7 +88,7 @@ class _DeliveryState extends State<Delivery> {
                               context, '/pickup-date');
                         },
                       ),
-                      SizedBox(width: 12.0),
+                      SizedBox(width: 16.0),
                       FloatingActionButton(
                         heroTag: 1,
                         backgroundColor: Colors.orange[900],

@@ -20,9 +20,7 @@ class _DeliveryServicesState extends State<DeliveryServices> {
         child: Center(
             child: Column(
           children: <Widget>[
-            SizedBox(
-              child: Progress(),
-            ),
+            SizedBox(child: Progress()),
             SizedBox(
               child: Column(
                 children: <Widget>[
@@ -30,6 +28,7 @@ class _DeliveryServicesState extends State<DeliveryServices> {
                     "Delivery services",
                     style: TextStyle(fontSize: 24.0, height: 2.0),
                   ),
+                  SizedBox(height: 16.0),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
@@ -68,6 +67,7 @@ class _DeliveryServicesState extends State<DeliveryServices> {
                       ),
                     ],
                   ),
+                  SizedBox(height: 16.0),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[

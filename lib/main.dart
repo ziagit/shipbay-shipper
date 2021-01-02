@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shipbay/pages/auth/signin.dart';
+import 'package:shipbay/pages/auth/signup.dart';
 import 'package:shipbay/pages/home.dart';
 import 'package:shipbay/pages/loading.dart';
 import 'package:shipbay/pages/order/additional_details.dart';
@@ -28,6 +30,8 @@ void main() => runApp(MaterialApp(
         '/items': (_) => Items(),
         '/additional-details': (_) => AdditionalDetails(),
         '/carriers': (_) => Carriers(),
+        '/signin': (_) => Signin(),
+        '/signup': (_) => Signup(),
         '/payment-details': (_) => PaymentDetails(),
         '/shipper': (_) => Shipper()
       },

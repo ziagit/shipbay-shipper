@@ -21,9 +21,7 @@ class _ItemsState extends State<Items> {
         child: Center(
             child: Column(
           children: <Widget>[
-            SizedBox(
-              child: Progress(),
-            ),
+            SizedBox(child: Progress()),
             SingleChildScrollView(
               child: Column(
                 children: <Widget>[
@@ -31,6 +29,7 @@ class _ItemsState extends State<Items> {
                     "Items to be delivered",
                     style: TextStyle(fontSize: 24.0, height: 2.0),
                   ),
+                  SizedBox(height: 16.0),
                   TextFormField(
                     decoration: InputDecoration(hintText: 'Item description'),
                   ),
@@ -73,6 +72,7 @@ class _ItemsState extends State<Items> {
                   TextFormField(
                     decoration: InputDecoration(hintText: 'Number of items'),
                   ),
+                  SizedBox(height: 16.0),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
@@ -114,6 +114,7 @@ class _ItemsState extends State<Items> {
                       ),
                     ],
                   ),
+                  SizedBox(height: 16.0),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
