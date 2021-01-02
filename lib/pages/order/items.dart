@@ -12,139 +12,152 @@ class _ItemsState extends State<Items> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.orange[900],
-        title: Text("Items"),
-        centerTitle: true,
+        backgroundColor: Color(0xF8FAF8),
+        elevation: 0.0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+          ),
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, '/pickup-services');
+          },
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(30.0),
-        child: Center(
+      body: ListView(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(30.0),
             child: Column(
-          children: <Widget>[
-            SizedBox(child: Progress()),
-            SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  Text(
-                    "Items to be delivered",
-                    style: TextStyle(fontSize: 24.0, height: 2.0),
-                  ),
-                  SizedBox(height: 16.0),
-                  TextFormField(
-                    decoration: InputDecoration(hintText: 'Item description'),
-                  ),
-                  DropdownButtonFormField<String>(
-                    value: dropdownValue,
-                    icon: Icon(Icons.keyboard_arrow_down),
-                    iconSize: 24,
-                    elevation: 16,
-                    style: TextStyle(color: Colors.black),
-                    onChanged: (String newValue) {
-                      setState(() {
-                        dropdownValue = newValue;
-                      });
-                    },
-                    items: <String>[
-                      'Pallets',
-                      'Pieces',
-                      'Bundles',
-                      'Box',
-                      'Crate'
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  ),
-                  TextFormField(
-                    decoration: InputDecoration(hintText: 'Length'),
-                  ),
-                  TextFormField(
-                    decoration: InputDecoration(hintText: 'Width'),
-                  ),
-                  TextFormField(
-                    decoration: InputDecoration(hintText: 'Height'),
-                  ),
-                  TextFormField(
-                    decoration: InputDecoration(hintText: 'Weight'),
-                  ),
-                  TextFormField(
-                    decoration: InputDecoration(hintText: 'Number of items'),
-                  ),
-                  SizedBox(height: 16.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                SizedBox(child: Progress()),
+                SingleChildScrollView(
+                  child: Column(
                     children: <Widget>[
-                      Radio(
-                          value: 1,
-                          groupValue: null,
-                          onChanged: (val) {
-                            setState(() {
-                              //do nothing
-                            });
-                          }),
                       Text(
-                        "Stackable",
-                        style: TextStyle(fontSize: 11.0),
+                        "Items to be delivered",
+                        style: TextStyle(fontSize: 24.0, height: 2.0),
                       ),
-                      Radio(
-                          value: 1,
-                          groupValue: null,
-                          onChanged: (val) {
-                            setState(() {
-                              //do nothing
-                            });
-                          }),
-                      Text(
-                        "Temperature",
-                        style: TextStyle(fontSize: 11.0),
+                      SizedBox(height: 16.0),
+                      TextFormField(
+                        decoration:
+                            InputDecoration(hintText: 'Item description'),
                       ),
-                      Radio(
-                          value: 1,
-                          groupValue: null,
-                          onChanged: (val) {
-                            setState(() {
-                              //do nothing
-                            });
-                          }),
-                      Text(
-                        "Dangerous",
-                        style: TextStyle(fontSize: 11.0),
+                      DropdownButtonFormField<String>(
+                        value: dropdownValue,
+                        icon: Icon(Icons.keyboard_arrow_down),
+                        iconSize: 24,
+                        elevation: 16,
+                        style: TextStyle(color: Colors.black),
+                        onChanged: (String newValue) {
+                          setState(() {
+                            dropdownValue = newValue;
+                          });
+                        },
+                        items: <String>[
+                          'Pallets',
+                          'Pieces',
+                          'Bundles',
+                          'Box',
+                          'Crate'
+                        ].map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
+                      TextFormField(
+                        decoration: InputDecoration(hintText: 'Length'),
+                      ),
+                      TextFormField(
+                        decoration: InputDecoration(hintText: 'Width'),
+                      ),
+                      TextFormField(
+                        decoration: InputDecoration(hintText: 'Height'),
+                      ),
+                      TextFormField(
+                        decoration: InputDecoration(hintText: 'Weight'),
+                      ),
+                      TextFormField(
+                        decoration:
+                            InputDecoration(hintText: 'Number of items'),
+                      ),
+                      SizedBox(height: 16.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Radio(
+                              value: 1,
+                              groupValue: null,
+                              onChanged: (val) {
+                                setState(() {
+                                  //do nothing
+                                });
+                              }),
+                          Text(
+                            "Stackable",
+                            style: TextStyle(fontSize: 11.0),
+                          ),
+                          Radio(
+                              value: 1,
+                              groupValue: null,
+                              onChanged: (val) {
+                                setState(() {
+                                  //do nothing
+                                });
+                              }),
+                          Text(
+                            "Temperature",
+                            style: TextStyle(fontSize: 11.0),
+                          ),
+                          Radio(
+                              value: 1,
+                              groupValue: null,
+                              onChanged: (val) {
+                                setState(() {
+                                  //do nothing
+                                });
+                              }),
+                          Text(
+                            "Dangerous",
+                            style: TextStyle(fontSize: 11.0),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 16.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          FloatingActionButton(
+                            heroTag: 0,
+                            backgroundColor: Colors.orange[50],
+                            foregroundColor: Colors.orange[900],
+                            child: Icon(Icons.keyboard_arrow_left),
+                            onPressed: () {
+                              Navigator.pushReplacementNamed(
+                                  context, '/delivery-services');
+                            },
+                          ),
+                          SizedBox(width: 12.0),
+                          FloatingActionButton(
+                            heroTag: 1,
+                            backgroundColor: Colors.orange[900],
+                            child: Icon(Icons.keyboard_arrow_right),
+                            onPressed: () {
+                              Navigator.pushReplacementNamed(
+                                  context, '/additional-details');
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  SizedBox(height: 16.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      FloatingActionButton(
-                        heroTag: 0,
-                        backgroundColor: Colors.orange[50],
-                        foregroundColor: Colors.orange[900],
-                        child: Icon(Icons.keyboard_arrow_left),
-                        onPressed: () {
-                          Navigator.pushReplacementNamed(
-                              context, '/delivery-services');
-                        },
-                      ),
-                      SizedBox(width: 12.0),
-                      FloatingActionButton(
-                        heroTag: 1,
-                        backgroundColor: Colors.orange[900],
-                        child: Icon(Icons.keyboard_arrow_right),
-                        onPressed: () {
-                          Navigator.pushReplacementNamed(
-                              context, '/additional-details');
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        )),
+          )
+        ],
       ),
     );
   }

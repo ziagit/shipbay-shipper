@@ -41,7 +41,7 @@ class MainMenu extends StatelessWidget {
           leading: Icon(Icons.person),
           title: Text(
             "Profile",
-            style: TextStyle(fontSize: 18.0),
+            style: TextStyle(fontSize: 14.0),
           ),
           onTap: () {
             Navigator.of(context).pop();
@@ -52,14 +52,14 @@ class MainMenu extends StatelessWidget {
           leading: Icon(Icons.settings),
           title: Text(
             "Settings",
-            style: TextStyle(fontSize: 18.0),
+            style: TextStyle(fontSize: 14.0),
           ),
         ),
         ListTile(
           leading: Icon(Icons.arrow_back),
           title: Text(
             "Logout",
-            style: TextStyle(fontSize: 18.0),
+            style: TextStyle(fontSize: 14.0),
           ),
         ),
       ],

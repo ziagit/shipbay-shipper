@@ -11,91 +11,103 @@ class _DeliveryServicesState extends State<DeliveryServices> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.orange[900],
-        title: Text("Delivery services"),
-        centerTitle: true,
+        backgroundColor: Color(0xF8FAF8),
+        elevation: 0.0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+          ),
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, '/delivery');
+          },
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(30.0),
-        child: Center(
+      body: ListView(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(30.0),
             child: Column(
-          children: <Widget>[
-            SizedBox(child: Progress()),
-            SizedBox(
-              child: Column(
-                children: <Widget>[
-                  Text(
-                    "Delivery services",
-                    style: TextStyle(fontSize: 24.0, height: 2.0),
-                  ),
-                  SizedBox(height: 16.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(child: Progress()),
+                Container(
+                  child: Column(
                     children: <Widget>[
-                      Checkbox(
-                          value: false,
-                          onChanged: (val) {
-                            setState(() {
-                              //do nothing
-                            });
-                          }),
                       Text(
-                        "Inside pick-up",
-                        style: TextStyle(fontSize: 11.0),
+                        "Delivery services",
+                        style: TextStyle(fontSize: 24.0, height: 2.0),
                       ),
-                      Checkbox(
-                          value: false,
-                          onChanged: (val) {
-                            setState(() {
-                              //do nothing
-                            });
-                          }),
-                      Text(
-                        "Tailgate",
-                        style: TextStyle(fontSize: 11.0),
+                      SizedBox(height: 16.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Checkbox(
+                              value: false,
+                              onChanged: (val) {
+                                setState(() {
+                                  //do nothing
+                                });
+                              }),
+                          Text(
+                            "Inside pick-up",
+                            style: TextStyle(fontSize: 11.0),
+                          ),
+                          Checkbox(
+                              value: false,
+                              onChanged: (val) {
+                                setState(() {
+                                  //do nothing
+                                });
+                              }),
+                          Text(
+                            "Tailgate",
+                            style: TextStyle(fontSize: 11.0),
+                          ),
+                          Checkbox(
+                              value: false,
+                              onChanged: (val) {
+                                setState(() {
+                                  //do nothing
+                                });
+                              }),
+                          Text(
+                            "Appointment",
+                            style: TextStyle(fontSize: 11.0),
+                          ),
+                        ],
                       ),
-                      Checkbox(
-                          value: false,
-                          onChanged: (val) {
-                            setState(() {
-                              //do nothing
-                            });
-                          }),
-                      Text(
-                        "Appointment",
-                        style: TextStyle(fontSize: 11.0),
+                      SizedBox(height: 16.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          FloatingActionButton(
+                            heroTag: 0,
+                            backgroundColor: Colors.orange[50],
+                            foregroundColor: Colors.orange[900],
+                            child: Icon(Icons.keyboard_arrow_left),
+                            onPressed: () {
+                              Navigator.pushReplacementNamed(
+                                  context, '/delivery');
+                            },
+                          ),
+                          SizedBox(width: 12.0),
+                          FloatingActionButton(
+                            heroTag: 1,
+                            backgroundColor: Colors.orange[900],
+                            child: Icon(Icons.keyboard_arrow_right),
+                            onPressed: () {
+                              Navigator.pushReplacementNamed(context, '/items');
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  SizedBox(height: 16.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      FloatingActionButton(
-                        heroTag: 0,
-                        backgroundColor: Colors.orange[50],
-                        foregroundColor: Colors.orange[900],
-                        child: Icon(Icons.keyboard_arrow_left),
-                        onPressed: () {
-                          Navigator.pushReplacementNamed(context, '/delivery');
-                        },
-                      ),
-                      SizedBox(width: 12.0),
-                      FloatingActionButton(
-                        heroTag: 1,
-                        backgroundColor: Colors.orange[900],
-                        child: Icon(Icons.keyboard_arrow_right),
-                        onPressed: () {
-                          Navigator.pushReplacementNamed(context, '/items');
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        )),
+          )
+        ],
       ),
     );
   }
