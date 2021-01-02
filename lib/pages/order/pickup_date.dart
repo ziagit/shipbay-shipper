@@ -45,9 +45,7 @@ class _PickupDateState extends State<PickupDate> {
         child: Center(
             child: Column(
           children: <Widget>[
-            Expanded(
-              child: Progress(),
-            ),
+            SizedBox(child: Progress()),
             Expanded(
               child: Container(
                 child: Column(
@@ -56,12 +54,14 @@ class _PickupDateState extends State<PickupDate> {
                       "Pickup time",
                       style: TextStyle(fontSize: 24.0, height: 2.0),
                     ),
+                    SizedBox(height: 16.0),
                     TextFormField(
                       onTap: () {
                         _selectDate(context);
                       },
                       decoration: InputDecoration(hintText: 'Select a date'),
                     ),
+                    SizedBox(height: 16.0),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
@@ -78,6 +78,13 @@ class _PickupDateState extends State<PickupDate> {
                         ),
                       ],
                     ),
+                    TextFormField(
+                      onTap: () {
+                        _selectDate(context);
+                      },
+                      decoration: InputDecoration(hintText: 'Select time'),
+                    ),
+                    SizedBox(height: 16.0),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
@@ -91,7 +98,7 @@ class _PickupDateState extends State<PickupDate> {
                                 context, '/pickup-services');
                           },
                         ),
-                        SizedBox(width: 12.0),
+                        SizedBox(width: 16.0),
                         FloatingActionButton(
                           heroTag: 1,
                           backgroundColor: Colors.orange[900],

@@ -20,9 +20,7 @@ class _PickupServicesState extends State<PickupServices> {
         child: Center(
             child: Column(
           children: <Widget>[
-            SizedBox(
-              child: Progress(),
-            ),
+            SizedBox(child: Progress()),
             SizedBox(
               child: Column(
                 children: <Widget>[
@@ -30,6 +28,7 @@ class _PickupServicesState extends State<PickupServices> {
                     "Pickup services",
                     style: TextStyle(fontSize: 24.0, height: 2.0),
                   ),
+                  SizedBox(height: 16.0),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
@@ -57,6 +56,7 @@ class _PickupServicesState extends State<PickupServices> {
                       ),
                     ],
                   ),
+                  SizedBox(height: 16.0),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
@@ -69,7 +69,7 @@ class _PickupServicesState extends State<PickupServices> {
                           Navigator.pushReplacementNamed(context, '/pickup');
                         },
                       ),
-                      SizedBox(width: 12.0),
+                      SizedBox(width: 16.0),
                       FloatingActionButton(
                         heroTag: 1,
                         backgroundColor: Colors.orange[900],
