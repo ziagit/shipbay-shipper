@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:shipbay/pages/shared/progress.dart';
 import 'package:google_maps_webservice/places.dart';
@@ -41,6 +43,7 @@ class _PickupState extends State<Pickup> {
                     "Shipment source",
                     style: TextStyle(fontSize: 24.0, height: 2.0),
                   ),
+                  
                   TextFormField(
                     decoration: InputDecoration(hintText: 'Postal code'),
                   ),
