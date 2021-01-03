@@ -30,7 +30,7 @@ class _ItemsState extends State<Items> {
             padding: const EdgeInsets.all(30.0),
             child: Column(
               children: <Widget>[
-                SizedBox(child: Progress(66)),
+                SizedBox(child: Progress(progress: 61.0)),
                 SingleChildScrollView(
                   child: Column(
                     children: <Widget>[
@@ -67,21 +67,45 @@ class _ItemsState extends State<Items> {
                           );
                         }).toList(),
                       ),
-                      TextFormField(
-                        decoration: InputDecoration(hintText: 'Length'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Flexible(
+                            child: TextFormField(
+                              decoration: InputDecoration(hintText: 'Length'),
+                              style: TextStyle(fontSize: 12.0),
+                            ),
+                          ),
+                          Flexible(
+                            child: TextFormField(
+                              decoration: InputDecoration(hintText: 'Width'),
+                              style: TextStyle(fontSize: 12.0),
+                            ),
+                          ),
+                          Flexible(
+                            child: TextFormField(
+                              decoration: InputDecoration(hintText: 'Height'),
+                              style: TextStyle(fontSize: 12.0),
+                            ),
+                          )
+                        ],
                       ),
-                      TextFormField(
-                        decoration: InputDecoration(hintText: 'Width'),
-                      ),
-                      TextFormField(
-                        decoration: InputDecoration(hintText: 'Height'),
-                      ),
-                      TextFormField(
-                        decoration: InputDecoration(hintText: 'Weight'),
-                      ),
-                      TextFormField(
-                        decoration:
-                            InputDecoration(hintText: 'Number of items'),
+                      Row(
+                        children: <Widget>[
+                          Flexible(
+                            child: TextFormField(
+                              decoration: InputDecoration(hintText: 'Weight'),
+                              style: TextStyle(fontSize: 12.0),
+                            ),
+                          ),
+                          Flexible(
+                            child: TextFormField(
+                              decoration:
+                                  InputDecoration(hintText: 'Number of items'),
+                              style: TextStyle(fontSize: 12.0),
+                            ),
+                          ),
+                        ],
                       ),
                       SizedBox(height: 16.0),
                       Row(

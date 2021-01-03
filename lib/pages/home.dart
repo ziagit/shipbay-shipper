@@ -21,7 +21,7 @@ class _HomeState extends State<Home> {
       backgroundColor: Colors.orange[900],
       appBar: AppBar(
         backgroundColor: Color(0xF8FAF8),
-        iconTheme: IconThemeData(color: Colors.black),
+        iconTheme: IconThemeData(color: Colors.white),
         elevation: 0,
         actions: [
           Builder(
@@ -57,23 +57,40 @@ class _HomeState extends State<Home> {
                   "The way you book your shipment",
                   style: TextStyle(color: Colors.white),
                 ),
-                SizedBox(height: 24.0),
-                TextFormField(
-                  decoration: InputDecoration(hintText: 'Search a postal code'),
-                ),
-                SizedBox(height: 54.0),
-                RaisedButton(
-                  color: Colors.white,
-                  child: Text(
-                    "Quotation",
-                    style: TextStyle(
-                        color: Colors.orange[900], fontWeight: FontWeight.w600),
+                SizedBox(height: 56.0),
+                Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26.withOpacity(0.1),
+                        spreadRadius: 5,
+                        blurRadius: 7,
+                        offset: Offset(0, 3), // changes position of shadow
+                      ),
+                    ],
                   ),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(30.0)),
-                  onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/pickup');
-                  },
+                  child: TextFormField(
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 12.0, horizontal: 16.0),
+                      hintText: 'Search a postal code',
+                      filled: true,
+                      fillColor: Colors.white,
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(50.0)),
+                          borderSide: BorderSide.none),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(50.0)),
+                        borderSide: BorderSide.none,
+                      ),
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(context, '/pickup');
+                        },
+                        icon: Icon(Icons.search),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),

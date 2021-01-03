@@ -7,8 +7,8 @@ class PickupDate extends StatefulWidget {
 }
 
 class _PickupDateState extends State<PickupDate> {
-  String title = "Pick a date";
   DateTime _date = DateTime.now();
+  TimeOfDay _time = TimeOfDay.now();
 
   Future<Null> _selectDate(BuildContext context) async {
     DateTime _datePicker = await showDatePicker(
@@ -27,13 +27,32 @@ class _PickupDateState extends State<PickupDate> {
     if (_datePicker != null && _datePicker != _date) {
       setState(() {
         _date = _datePicker;
-        print(_date.toString());
+      });
+    }
+  }
+
+  Future<Null> _selectTime(BuildContext context) async {
+    TimeOfDay _timePicker = await showTimePicker(
+        context: context,
+        initialTime: _time,
+        builder: (context, child) {
+          return Theme(
+            data: ThemeData(
+              primarySwatch: Colors.deepOrange,
+            ),
+            child: child,
+          );
+        });
+    if (_timePicker != null && _timePicker != _time) {
+      setState(() {
+        _time = _timePicker;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    bool is_appointment = false;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xF8FAF8),
@@ -54,74 +73,78 @@ class _PickupDateState extends State<PickupDate> {
             padding: const EdgeInsets.all(30.0),
             child: Column(
               children: <Widget>[
-                Container(child: Progress(33)),
+                Container(child: Progress(progress: 25.0)),
                 Container(
-                  child: Container(
-                    child: Column(
-                      children: <Widget>[
-                        Text(
-                          "Pickup time",
-                          style: TextStyle(fontSize: 24.0, height: 2.0),
-                        ),
-                        SizedBox(height: 16.0),
-                        TextFormField(
-                          onTap: () {
-                            _selectDate(context);
-                          },
-                          decoration:
-                              InputDecoration(hintText: 'Select a date'),
-                        ),
-                        SizedBox(height: 16.0),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Checkbox(
-                                value: false,
-                                onChanged: (val) {
-                                  setState(() {
-                                    //do nothing
-                                  });
-                                }),
-                            Text(
+                  child: Column(
+                    children: <Widget>[
+                      Text(
+                        "When to pickup?",
+                        style: TextStyle(fontSize: 24.0, height: 2.0),
+                      ),
+                      SizedBox(height: 16.0),
+                      TextFormField(
+                        onTap: () {
+                          _selectDate(context);
+                        },
+                        decoration: InputDecoration(hintText: 'Select a date'),
+                      ),
+                      SizedBox(height: 16.0),
+                      Row(
+                        children: <Widget>[
+                          Flexible(
+                              child: CheckboxListTile(
+                            activeColor: Colors.pink[300],
+                            dense: true,
+                            title: Text(
                               "Appointment",
                               style: TextStyle(fontSize: 11.0),
                             ),
-                          ],
-                        ),
-                        TextFormField(
+                            value: is_appointment,
+                            onChanged: (bool value) {
+                              setState(() {
+                                print("app value $value");
+                                is_appointment = value;
+                              });
+                            },
+                          ))
+                        ],
+                      ),
+                      Visibility(
+                        visible: is_appointment,
+                        child: TextFormField(
                           onTap: () {
-                            _selectDate(context);
+                            _selectTime(context);
                           },
                           decoration: InputDecoration(hintText: 'Select time'),
                         ),
-                        SizedBox(height: 16.0),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            FloatingActionButton(
-                              heroTag: 0,
-                              backgroundColor: Colors.orange[50],
-                              foregroundColor: Colors.orange[900],
-                              child: Icon(Icons.keyboard_arrow_left),
-                              onPressed: () {
-                                Navigator.pushReplacementNamed(
-                                    context, '/pickup-services');
-                              },
-                            ),
-                            SizedBox(width: 16.0),
-                            FloatingActionButton(
-                              heroTag: 1,
-                              backgroundColor: Colors.orange[900],
-                              child: Icon(Icons.keyboard_arrow_right),
-                              onPressed: () {
-                                Navigator.pushReplacementNamed(
-                                    context, '/delivery');
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                      ),
+                      SizedBox(height: 16.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          FloatingActionButton(
+                            heroTag: 0,
+                            backgroundColor: Colors.orange[50],
+                            foregroundColor: Colors.orange[900],
+                            child: Icon(Icons.keyboard_arrow_left),
+                            onPressed: () {
+                              Navigator.pushReplacementNamed(
+                                  context, '/pickup-services');
+                            },
+                          ),
+                          SizedBox(width: 16.0),
+                          FloatingActionButton(
+                            heroTag: 1,
+                            backgroundColor: Colors.orange[900],
+                            child: Icon(Icons.keyboard_arrow_right),
+                            onPressed: () {
+                              Navigator.pushReplacementNamed(
+                                  context, '/delivery');
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shipbay/pages/shared/progress.dart';
 
 class PaymentDetails extends StatefulWidget {
   @override
@@ -15,7 +16,7 @@ class _PaymentDetailsState extends State<PaymentDetails> {
         centerTitle: true,
       ),
       body: Center(
-        child: Text("PaymentDetails "),
+        child: Progress(progress: 100.0),
       ),
     );
   }

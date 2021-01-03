@@ -10,11 +10,12 @@ class _SigninState extends State<Signin> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.orange[900],
+        backgroundColor: Color(0xF8FAF8),
         elevation: 0.0,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
+            color: Colors.black,
           ),
           onPressed: () {
             Navigator.pushReplacementNamed(context, '/carriers');
@@ -52,38 +53,49 @@ class _SigninState extends State<Signin> {
                       decoration: InputDecoration(hintText: 'Password'),
                     ),
                     SizedBox(height: 8.0),
-                    Container(
-                      child: FlatButton(
-                        child: Text("Forget password"),
-                        onPressed: () {},
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        SizedBox(width: 1.0),
+                        FlatButton(
+                          child: Text("Forget password"),
+                          onPressed: () {},
+                        ),
+                      ],
                     ),
                     SizedBox(height: 24.0),
-                    RaisedButton(
-                      color: Colors.orange[900],
-                      child: Text(
-                        "Login",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.w600),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 46.0,
+                      child: RaisedButton(
+                        color: Colors.orange[900],
+                        child: Text(
+                          "Login",
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.w600),
+                        ),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(30.0)),
+                        onPressed: () {
+                          //
+                        },
                       ),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(30.0)),
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/pickup');
-                      },
                     ),
-                    FlatButton(
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/signup');
-                      },
-                      child: Text(
-                        'Register',
-                        style: TextStyle(color: Colors.orange[900]),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(30.0),
-                      ),
-                    )
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        SizedBox(width: 1.0),
+                        FlatButton(
+                          child: Text(
+                            "Register",
+                            style: TextStyle(color: Colors.orange[900]),
+                          ),
+                          onPressed: () {
+                            Navigator.pushReplacementNamed(context, '/signup');
+                          },
+                        ),
+                      ],
+                    ),
                   ],
                 ))
               ],

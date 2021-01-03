@@ -29,7 +29,7 @@ class _PickupServicesState extends State<PickupServices> {
             padding: const EdgeInsets.all(30.0),
             child: Column(
               children: <Widget>[
-                SizedBox(child: Progress(22)),
+                SizedBox(child: Progress(progress: 12.0)),
                 Container(
                   child: Column(
                     children: <Widget>[

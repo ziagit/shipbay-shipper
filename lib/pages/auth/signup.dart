@@ -10,11 +10,12 @@ class _SignupState extends State<Signup> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.orange[900],
+        backgroundColor: Color(0xF8FAF8),
         elevation: 0.0,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
+            color: Colors.black,
           ),
           onPressed: () {
             Navigator.pushReplacementNamed(context, '/carriers');
@@ -55,30 +56,40 @@ class _SignupState extends State<Signup> {
                       decoration: InputDecoration(hintText: 'Confirm password'),
                     ),
                     SizedBox(height: 60.0),
-                    RaisedButton(
-                      color: Colors.orange[900],
-                      child: Text(
-                        "Signup",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.w600),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 46.0,
+                      child: RaisedButton(
+                        color: Colors.orange[900],
+                        child: Text(
+                          "Signup",
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.w600),
+                        ),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(30.0)),
+                        onPressed: () {
+                          //;
+                        },
                       ),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(30.0)),
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/pickup');
-                      },
                     ),
-                    FlatButton(
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/signin');
-                      },
-                      child: Text(
-                        'Signin',
-                        style: TextStyle(color: Colors.orange[900]),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(30.0),
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        SizedBox(width: 1.0),
+                        FlatButton(
+                          onPressed: () {
+                            Navigator.pushReplacementNamed(context, '/signin');
+                          },
+                          child: Text(
+                            'Signin',
+                            style: TextStyle(color: Colors.orange[900]),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(30.0),
+                          ),
+                        )
+                      ],
                     )
                   ],
                 ))
