@@ -18,18 +18,18 @@ class _HomeState extends State<Home> {
     SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(statusBarColor: Colors.orange[900]));
     return Scaffold(
+      backgroundColor: Colors.orange[900],
       appBar: AppBar(
         backgroundColor: Color(0xF8FAF8),
-        title: Text(
-          "Shipbay",
-          style: TextStyle(color: Colors.black),
-        ),
         iconTheme: IconThemeData(color: Colors.black),
         elevation: 0,
         actions: [
           Builder(
             builder: (context) => IconButton(
-              icon: Icon(Icons.location_on),
+              icon: Icon(
+                Icons.location_on,
+                color: Colors.white,
+              ),
               onPressed: () => Scaffold.of(context).openEndDrawer(),
               tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
             ),
@@ -38,36 +38,48 @@ class _HomeState extends State<Home> {
       ),
       drawer: MainMenu(),
       endDrawer: Tracking(),
-      body: Padding(
-        padding: const EdgeInsets.all(30.0),
-        child: Center(
+      body: ListView(children: <Widget>[
+        Container(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(30.0, 200.0, 30.0, 30.0),
             child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              "Let’s book your shipment in a few taps.",
-              style: TextStyle(
-                fontSize: 24.0,
-              ),
-              textAlign: TextAlign.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  "SB",
+                  style: TextStyle(
+                      color: Colors.white, fontSize: 64.0, height: 0.4),
+                ),
+                Text("ShipBay",
+                    style: TextStyle(
+                        color: Colors.white, fontSize: 38.0, height: 1.0)),
+                Text(
+                  "The way you book your shipment",
+                  style: TextStyle(color: Colors.white),
+                ),
+                SizedBox(height: 24.0),
+                TextFormField(
+                  decoration: InputDecoration(hintText: 'Search a postal code'),
+                ),
+                SizedBox(height: 54.0),
+                RaisedButton(
+                  color: Colors.white,
+                  child: Text(
+                    "Quotation",
+                    style: TextStyle(
+                        color: Colors.orange[900], fontWeight: FontWeight.w600),
+                  ),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(30.0)),
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/pickup');
+                  },
+                ),
+              ],
             ),
-            SizedBox(height: 24.0),
-            RaisedButton(
-              color: Colors.orange[900],
-              child: Text(
-                "Get Quote",
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-              ),
-              shape: RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(30.0)),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, '/pickup');
-              },
-            ),
-          ],
-        )),
-      ),
+          ),
+        )
+      ]),
     );
   }
 }

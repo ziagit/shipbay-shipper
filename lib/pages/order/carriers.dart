@@ -31,7 +31,7 @@ class _CarriersState extends State<Carriers> {
             padding: const EdgeInsets.all(30.0),
             child: Column(
               children: <Widget>[
-                Container(child: Progress()),
+                Container(child: Progress(88)),
                 SizedBox(height: 24.0),
                 Card(
                   child: Padding(

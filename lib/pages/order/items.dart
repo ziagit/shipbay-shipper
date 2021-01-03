@@ -30,7 +30,7 @@ class _ItemsState extends State<Items> {
             padding: const EdgeInsets.all(30.0),
             child: Column(
               children: <Widget>[
-                SizedBox(child: Progress()),
+                SizedBox(child: Progress(66)),
                 SingleChildScrollView(
                   child: Column(
                     children: <Widget>[

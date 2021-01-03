@@ -54,7 +54,7 @@ class _PickupDateState extends State<PickupDate> {
             padding: const EdgeInsets.all(30.0),
             child: Column(
               children: <Widget>[
-                Container(child: Progress()),
+                Container(child: Progress(33)),
                 Container(
                   child: Container(
                     child: Column(

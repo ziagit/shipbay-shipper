@@ -29,7 +29,7 @@ class _DeliveryServicesState extends State<DeliveryServices> {
             padding: const EdgeInsets.all(30.0),
             child: Column(
               children: <Widget>[
-                Container(child: Progress()),
+                Container(child: Progress(55)),
                 Container(
                   child: Column(
                     children: <Widget>[

@@ -29,7 +29,7 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
             padding: const EdgeInsets.all(30.0),
             child: Column(
               children: <Widget>[
-                Container(child: Progress()),
+                Container(child: Progress(77)),
                 Container(
                   child: Column(
                     children: <Widget>[
