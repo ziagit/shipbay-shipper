@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shipbay/pages/services/app_colors.dart';
 import 'package:shipbay/pages/shared/main_menu.dart';
 import 'package:shipbay/pages/tracking/tracking.dart';
 
@@ -52,10 +51,10 @@ class _HomeState extends State<Home> {
                 ),
                 Text("ShipBay",
                     style: TextStyle(
-                        color: Colors.white, fontSize: 38.0, height: 1.0)),
+                        color: Colors.white, fontSize: 28.0, height: 1.4)),
                 Text(
                   "The way you book your shipment",
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.white, height: 1.5),
                 ),
                 SizedBox(height: 56.0),
                 Container(

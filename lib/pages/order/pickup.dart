@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shipbay/models/accessory.dart';
 import 'package:shipbay/pages/shared/progress.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
+import 'package:shipbay/services/api.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:async';
 
 class Pickup extends StatefulWidget {
   @override
@@ -10,13 +15,21 @@ class Pickup extends StatefulWidget {
 }
 
 class _PickupState extends State<Pickup> {
-  _google() async {
-    Prediction prediction = await PlacesAutocomplete.show(
-        context: context,
-        apiKey: "AIzaSyAQTHaD2g0BjmczBlX73Vv-KthtHzdRYPk",
-        mode: Mode.fullscreen, // Mode.overlay
-        language: "en",
-        components: [Component(Component.country, "pk")]);
+  Future<List<Accessory>> _getAccessories() async {
+    var response = await http.get("http://104.154.95.189/api/location-type");
+    var jsonData = json.decode(response.body);
+
+    List<Accessory> accessories = [];
+    for (var a in jsonData) {
+      Accessory accessory = Accessory(a['index'], a['name'], a['code']);
+      accessories.add(accessory);
+      print(a['name']);
+    }
+    if (accessories.isNotEmpty) {
+      return accessories;
+    } else {
+      return [];
+    }
   }
 
   @override
@@ -56,50 +69,27 @@ class _PickupState extends State<Pickup> {
                           decoration: InputDecoration(hintText: 'Postal code'),
                         ),
                         SizedBox(height: 16.0),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Radio(
-                                value: 1,
-                                groupValue: null,
-                                onChanged: (val) {
-                                  setState(() {
-                                    //do nothing
-                                  });
-                                }),
-                            Text(
-                              "Business",
-                              style: TextStyle(fontSize: 11.0),
-                            ),
-                            Radio(
-                                value: 1,
-                                groupValue: null,
-                                onChanged: (val) {
-                                  setState(() {
-                                    //do nothing
-                                  });
-                                }),
-                            Text(
-                              "Residential",
-                              style: TextStyle(fontSize: 11.0),
-                            ),
-                            Radio(
-                                value: 1,
-                                groupValue: null,
-                                onChanged: (val) {
-                                  setState(() {
-                                    //do nothing
-                                  });
-                                }),
-                            Text(
-                              "Special location",
-                              style: TextStyle(fontSize: 11.0),
-                            ),
-                          ],
+                        FutureBuilder(
+                          future: _getAccessories(),
+                          builder:
+                              (BuildContext context, AsyncSnapshot snapshot) {
+                            if (snapshot.data != null) {
+                              return ListView.builder(
+                                scrollDirection: Axis.vertical,
+                                shrinkWrap: true,
+                                itemCount: snapshot.data.length,
+                                itemBuilder: (context, index) {
+                                  return ListTile(
+                                    title: Text(snapshot.data[index].name),
+                                  );
+                                },
+                              );
+                            } else {
+                              return Text("no data");
+                            }
+                          },
                         ),
-                        SizedBox(
-                          height: 16.0,
-                        ),
+                        SizedBox(height: 16.0),
                         FloatingActionButton(
                           heroTag: 1,
                           backgroundColor: Colors.orange[900],
@@ -118,4 +108,11 @@ class _PickupState extends State<Pickup> {
       ),
     );
   }
+}
+
+class Accessory {
+  int index;
+  String name;
+  String code;
+  Accessory(this.index, this.name, this.code);
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shipbay/pages/services/api.dart';
+import 'package:shipbay/services/api.dart';
 
 class Loading extends StatefulWidget {
   @override
@@ -19,7 +19,6 @@ class _LoadingState extends State<Loading> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     setupCountries();
   }
