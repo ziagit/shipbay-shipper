@@ -7,6 +7,7 @@ class Delivery extends StatefulWidget {
 }
 
 class _DeliveryState extends State<Delivery> {
+  String groupValue = 'bs';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,43 +44,52 @@ class _DeliveryState extends State<Delivery> {
                       ),
                       SizedBox(height: 16.0),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          Radio(
-                              value: 1,
-                              groupValue: null,
-                              onChanged: (val) {
-                                setState(() {
-                                  //do nothing
-                                });
-                              }),
-                          Text(
-                            "Business",
-                            style: TextStyle(fontSize: 11.0),
+                          Row(
+                            children: <Widget>[
+                              Radio(
+                                  activeColor: Colors.orange[900],
+                                  value: "bs",
+                                  groupValue: groupValue,
+                                  onChanged: (val) {
+                                    groupValue = val;
+                                    setState(() {});
+                                  }),
+                              Text(
+                                "Business",
+                                style: TextStyle(fontSize: 11.0),
+                              ),
+                            ],
                           ),
-                          Radio(
-                              value: 1,
-                              groupValue: null,
-                              onChanged: (val) {
-                                setState(() {
-                                  //do nothing
-                                });
-                              }),
-                          Text(
-                            "Residential",
-                            style: TextStyle(fontSize: 11.0),
+                          Row(
+                            children: <Widget>[
+                              Radio(
+                                  value: "rs",
+                                  groupValue: groupValue,
+                                  onChanged: (val) {
+                                    groupValue = val;
+                                    setState(() {});
+                                  }),
+                              Text(
+                                "Residential",
+                                style: TextStyle(fontSize: 11.0),
+                              ),
+                            ],
                           ),
-                          Radio(
-                              value: 1,
-                              groupValue: null,
-                              onChanged: (val) {
-                                setState(() {
-                                  //do nothing
-                                });
-                              }),
-                          Text(
-                            "Special location",
-                            style: TextStyle(fontSize: 11.0),
+                          Row(
+                            children: <Widget>[
+                              Radio(
+                                  value: "sp",
+                                  groupValue: groupValue,
+                                  onChanged: (val) {
+                                    groupValue = val;
+                                    setState(() {});
+                                  }),
+                              Text(
+                                "Special location",
+                                style: TextStyle(fontSize: 11.0),
+                              ),
+                            ],
                           ),
                         ],
                       ),

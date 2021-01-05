@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shipbay/pages/shared/progress.dart';
+import 'package:shipbay/services/settings.dart';
 
 class Items extends StatefulWidget {
   @override
@@ -7,12 +8,18 @@ class Items extends StatefulWidget {
 }
 
 class _ItemsState extends State<Items> {
+  Map<String, bool> services = {
+    'Stackable': false,
+    'Dangerous': false,
+    'Temperature sensitive': false,
+  };
+  bool _isTemperature = false;
   String dropdownValue = 'Pallets';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xF8FAF8),
+        backgroundColor: bgColor,
         elevation: 0.0,
         leading: IconButton(
           icon: Icon(
@@ -107,47 +114,53 @@ class _ItemsState extends State<Items> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 16.0),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Radio(
-                              value: 1,
-                              groupValue: null,
-                              onChanged: (val) {
-                                setState(() {
-                                  //do nothing
-                                });
-                              }),
-                          Text(
-                            "Stackable",
-                            style: TextStyle(fontSize: 11.0),
-                          ),
-                          Radio(
-                              value: 1,
-                              groupValue: null,
-                              onChanged: (val) {
-                                setState(() {
-                                  //do nothing
-                                });
-                              }),
-                          Text(
-                            "Temperature",
-                            style: TextStyle(fontSize: 11.0),
-                          ),
-                          Radio(
-                              value: 1,
-                              groupValue: null,
-                              onChanged: (val) {
-                                setState(() {
-                                  //do nothing
-                                });
-                              }),
-                          Text(
-                            "Dangerous",
-                            style: TextStyle(fontSize: 11.0),
-                          ),
-                        ],
+                      SizedBox(height: 24.0),
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        child: Text("Is your item?"),
+                      ),
+                      ListView(
+                        shrinkWrap: true,
+                        children: services.keys.map((String key) {
+                          return new CheckboxListTile(
+                            activeColor: primary,
+                            title: new Text(
+                              key,
+                              style: TextStyle(fontSize: 11.0),
+                            ),
+                            value: services[key],
+                            onChanged: (bool val) {
+                              print("checkbox value: $key");
+                              setState(() {
+                                if (key == "Temperature sensitive") {
+                                  _isTemperature = !_isTemperature;
+                                }
+                                services[key] = val;
+                              });
+                            },
+                          );
+                        }).toList(),
+                      ),
+                      Visibility(
+                        visible: _isTemperature,
+                        child: Row(
+                          children: <Widget>[
+                            Flexible(
+                              child: TextFormField(
+                                decoration:
+                                    InputDecoration(hintText: 'Min(FRH)'),
+                                style: TextStyle(fontSize: 12.0),
+                              ),
+                            ),
+                            Flexible(
+                              child: TextFormField(
+                                decoration:
+                                    InputDecoration(hintText: 'Max(FRH)'),
+                                style: TextStyle(fontSize: 12.0),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       SizedBox(height: 16.0),
                       Row(

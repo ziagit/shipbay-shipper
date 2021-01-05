@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shipbay/pages/shared/progress.dart';
+import 'package:shipbay/services/settings.dart';
 
 class PickupDate extends StatefulWidget {
   @override
@@ -7,6 +8,7 @@ class PickupDate extends StatefulWidget {
 }
 
 class _PickupDateState extends State<PickupDate> {
+  bool _isAppointment = false;
   DateTime _date = DateTime.now();
   TimeOfDay _time = TimeOfDay.now();
 
@@ -55,7 +57,7 @@ class _PickupDateState extends State<PickupDate> {
     bool is_appointment = false;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xF8FAF8),
+        backgroundColor: bgColor,
         elevation: 0.0,
         leading: IconButton(
           icon: Icon(
@@ -91,26 +93,23 @@ class _PickupDateState extends State<PickupDate> {
                       SizedBox(height: 16.0),
                       Row(
                         children: <Widget>[
-                          Flexible(
-                              child: CheckboxListTile(
-                            activeColor: Colors.pink[300],
-                            dense: true,
-                            title: Text(
-                              "Appointment",
-                              style: TextStyle(fontSize: 11.0),
-                            ),
-                            value: is_appointment,
-                            onChanged: (bool value) {
+                          Checkbox(
+                            activeColor: primary,
+                            value: _isAppointment,
+                            onChanged: (bool val) {
                               setState(() {
-                                print("app value $value");
-                                is_appointment = value;
+                                _isAppointment = val;
                               });
                             },
-                          ))
+                          ),
+                          Text(
+                            "Appointment",
+                            style: TextStyle(fontSize: 11.0),
+                          ),
                         ],
                       ),
                       Visibility(
-                        visible: is_appointment,
+                        visible: _isAppointment,
                         child: TextFormField(
                           onTap: () {
                             _selectTime(context);
@@ -124,8 +123,8 @@ class _PickupDateState extends State<PickupDate> {
                         children: <Widget>[
                           FloatingActionButton(
                             heroTag: 0,
-                            backgroundColor: Colors.orange[50],
-                            foregroundColor: Colors.orange[900],
+                            backgroundColor: inActive,
+                            foregroundColor: primary,
                             child: Icon(Icons.keyboard_arrow_left),
                             onPressed: () {
                               Navigator.pushReplacementNamed(
@@ -135,7 +134,7 @@ class _PickupDateState extends State<PickupDate> {
                           SizedBox(width: 16.0),
                           FloatingActionButton(
                             heroTag: 1,
-                            backgroundColor: Colors.orange[900],
+                            backgroundColor: primary,
                             child: Icon(Icons.keyboard_arrow_right),
                             onPressed: () {
                               Navigator.pushReplacementNamed(

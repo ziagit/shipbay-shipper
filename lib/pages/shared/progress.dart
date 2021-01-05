@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:shipbay/services/settings.dart';
 
 class Progress extends StatefulWidget {
   final double progress;
@@ -24,7 +25,7 @@ class _ProgressState extends State<Progress> {
           style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
         ),
         circularStrokeCap: CircularStrokeCap.round,
-        progressColor: Colors.orange[900],
+        progressColor: primary,
       ),
     );
   }

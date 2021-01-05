@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shipbay/models/accessory.dart';
 import 'package:shipbay/pages/shared/progress.dart';
-import 'package:google_maps_webservice/places.dart';
-import 'package:flutter_google_places/flutter_google_places.dart';
+import 'package:shipbay/services/settings.dart';
 import 'package:shipbay/services/api.dart';
+import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:async';
 
 class Pickup extends StatefulWidget {
   @override
@@ -15,30 +15,34 @@ class Pickup extends StatefulWidget {
 }
 
 class _PickupState extends State<Pickup> {
-  Future<List<Accessory>> _getAccessories() async {
-    var response = await http.get("http://104.154.95.189/api/location-type");
-    var jsonData = json.decode(response.body);
+  String displayName = "";
 
-    List<Accessory> accessories = [];
-    for (var a in jsonData) {
-      Accessory accessory = Accessory(a['index'], a['name'], a['code']);
-      accessories.add(accessory);
-      print(a['name']);
-    }
-    if (accessories.isNotEmpty) {
-      return accessories;
-    } else {
-      return [];
-    }
+  String groupValue = 'bs';
+  Future<List<Accessory>> _getAccessories() async {
+    Accessories instance = Accessories("location-type");
+    return instance.getData();
+  }
+
+  getData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      displayName = prefs.getString('displayName');
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getData();
   }
 
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle(statusBarColor: Colors.orange[900]));
+        SystemUiOverlayStyle(statusBarColor: primary));
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xF8FAF8),
+        backgroundColor: bgColor,
         elevation: 0.0,
         leading: IconButton(
           icon: Icon(
@@ -67,32 +71,67 @@ class _PickupState extends State<Pickup> {
                         SizedBox(height: 16.0),
                         TextFormField(
                           decoration: InputDecoration(hintText: 'Postal code'),
+                          onChanged: (val) {
+                            findPlace(val);
+                          },
                         ),
                         SizedBox(height: 16.0),
-                        FutureBuilder(
-                          future: _getAccessories(),
-                          builder:
-                              (BuildContext context, AsyncSnapshot snapshot) {
-                            if (snapshot.data != null) {
-                              return ListView.builder(
-                                scrollDirection: Axis.vertical,
-                                shrinkWrap: true,
-                                itemCount: snapshot.data.length,
-                                itemBuilder: (context, index) {
-                                  return ListTile(
-                                    title: Text(snapshot.data[index].name),
-                                  );
-                                },
-                              );
-                            } else {
-                              return Text("no data");
-                            }
-                          },
+                        Row(
+                          children: <Widget>[
+                            Row(
+                              children: <Widget>[
+                                Radio(
+                                    activeColor: primary,
+                                    value: "bs",
+                                    groupValue: groupValue,
+                                    onChanged: (val) {
+                                      groupValue = val;
+                                      setState(() {});
+                                    }),
+                                Text(
+                                  "Business",
+                                  style: TextStyle(fontSize: 11.0),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Radio(
+                                    activeColor: primary,
+                                    value: "rs",
+                                    groupValue: groupValue,
+                                    onChanged: (val) {
+                                      groupValue = val;
+                                      setState(() {});
+                                    }),
+                                Text(
+                                  "Residential",
+                                  style: TextStyle(fontSize: 11.0),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Radio(
+                                    activeColor: primary,
+                                    value: "sp",
+                                    groupValue: groupValue,
+                                    onChanged: (val) {
+                                      groupValue = val;
+                                      setState(() {});
+                                    }),
+                                Text(
+                                  "Special location",
+                                  style: TextStyle(fontSize: 11.0),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                         SizedBox(height: 16.0),
                         FloatingActionButton(
                           heroTag: 1,
-                          backgroundColor: Colors.orange[900],
+                          backgroundColor: primary,
                           child: Icon(Icons.keyboard_arrow_right),
                           onPressed: () {
                             Navigator.pushReplacementNamed(
@@ -108,11 +147,20 @@ class _PickupState extends State<Pickup> {
       ),
     );
   }
-}
 
-class Accessory {
-  int index;
-  String name;
-  String code;
-  Accessory(this.index, this.name, this.code);
+  void findPlace(String placeName) async {
+    String key = "AIzaSyAQTHaD2g0BjmczBlX73Vv-KthtHzdRYPk";
+    if (placeName.length > 1) {
+      String autoComplete =
+          "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$placeName&key=$key&sessiontoken=1234567890&components:ca";
+      var res = await http.get(autoComplete);
+      if (res == "failed") {
+        return;
+      }
+      Map data = jsonDecode(res.body);
+
+      print("Response from google");
+      print(data['predictions'][0]['description']);
+    }
+  }
 }

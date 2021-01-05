@@ -46,15 +46,38 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
                         decoration: InputDecoration(hintText: 'Instructions'),
                       ),
                       SizedBox(height: 24.0),
-                      Text("Contacts: ", style: TextStyle(fontSize: 16.0)),
-                      TextFormField(
-                        decoration: InputDecoration(hintText: 'name'),
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        child: Text("Contacts: ",
+                            style: TextStyle(fontSize: 16.0)),
                       ),
-                      TextFormField(
-                        decoration: InputDecoration(hintText: 'Phone'),
+                      ExpansionTile(
+                        title: Text("Pickup"),
+                        children: <Widget>[
+                          TextFormField(
+                            decoration: InputDecoration(hintText: 'Name'),
+                          ),
+                          TextFormField(
+                            decoration: InputDecoration(hintText: 'Phone'),
+                          ),
+                          TextFormField(
+                            decoration: InputDecoration(hintText: 'Email'),
+                          ),
+                        ],
                       ),
-                      TextFormField(
-                        decoration: InputDecoration(hintText: 'Email'),
+                      ExpansionTile(
+                        title: Text("Delivery"),
+                        children: <Widget>[
+                          TextFormField(
+                            decoration: InputDecoration(hintText: 'Name'),
+                          ),
+                          TextFormField(
+                            decoration: InputDecoration(hintText: 'Phone'),
+                          ),
+                          TextFormField(
+                            decoration: InputDecoration(hintText: 'Email'),
+                          ),
+                        ],
                       ),
                       SizedBox(height: 24.0),
                       Row(
