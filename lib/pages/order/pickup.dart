@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shipbay/models/accessory.dart';
+import 'package:shipbay/models/placePredictions.dart';
+import 'package:shipbay/pages/shared/divider.dart';
+import 'package:shipbay/pages/shared/prediction_tile.dart';
 import 'package:shipbay/pages/shared/progress.dart';
 import 'package:shipbay/services/settings.dart';
 import 'package:shipbay/services/api.dart';
-import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'dart:async';
 import 'dart:convert';
 
 class Pickup extends StatefulWidget {
@@ -15,26 +18,10 @@ class Pickup extends StatefulWidget {
 }
 
 class _PickupState extends State<Pickup> {
+  var _addressController;
+  List<PlacePredictions> placePredictionList = [];
   String displayName = "";
-
   String groupValue = 'bs';
-  Future<List<Accessory>> _getAccessories() async {
-    Accessories instance = Accessories("location-type");
-    return instance.getData();
-  }
-
-  getData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      displayName = prefs.getString('displayName');
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getData();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,11 +57,35 @@ class _PickupState extends State<Pickup> {
                         ),
                         SizedBox(height: 16.0),
                         TextFormField(
+                          controller: _addressController,
                           decoration: InputDecoration(hintText: 'Postal code'),
                           onChanged: (val) {
                             findPlace(val);
                           },
                         ),
+
+                        //tile for predictions
+                        (placePredictionList.length > 0)
+                            ? Padding(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 8.0, horizontal: 16.0),
+                                child: ListView.separated(
+                                  padding: EdgeInsets.all(0.0),
+                                  itemBuilder: (context, index) {
+                                    return PredictionTile(
+                                      placePredictions:
+                                          placePredictionList[index],
+                                    );
+                                  },
+                                  separatorBuilder:
+                                      (BuildContext context, index) =>
+                                          DividerWidget(),
+                                  itemCount: placePredictionList.length,
+                                  shrinkWrap: true,
+                                  physics: ClampingScrollPhysics(),
+                                ),
+                              )
+                            : Container(),
                         SizedBox(height: 16.0),
                         Row(
                           children: <Widget>[
@@ -148,19 +159,38 @@ class _PickupState extends State<Pickup> {
     );
   }
 
+  @override
+  void initState() {
+    super.initState();
+    getData();
+  }
+
+  Future<List<Accessory>> _getAccessories() async {
+    Accessories instance = Accessories("location-type");
+    return instance.getData();
+  }
+
+  void getData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      displayName = prefs.getString('displayName');
+    });
+  }
+
   void findPlace(String placeName) async {
-    String key = "AIzaSyAQTHaD2g0BjmczBlX73Vv-KthtHzdRYPk";
     if (placeName.length > 1) {
       String autoComplete =
-          "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$placeName&key=$key&sessiontoken=1234567890&components:ca";
+          "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$placeName&key=$mapKey&sessiontoken=1234567890&components:ca";
       var res = await http.get(autoComplete);
-      if (res == "failed") {
-        return;
-      }
       Map data = jsonDecode(res.body);
+      var predictions = data['predictions'];
 
-      print("Response from google");
-      print(data['predictions'][0]['description']);
+      var placesList = (predictions as List)
+          .map((e) => PlacePredictions.fromJson(e))
+          .toList();
+      setState(() {
+        placePredictionList = placesList;
+      });
     }
   }
 }

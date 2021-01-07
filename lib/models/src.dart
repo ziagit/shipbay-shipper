@@ -4,9 +4,9 @@ class Src {
   String city;
   String zip;
   String street;
-  String streetNumber;
+  String street_number;
   String locationType;
 
   Src(this.country, this.state, this.city, this.zip, this.street,
-      this.streetNumber, this.locationType);
+      this.street_number, this.locationType);
 }

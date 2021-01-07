@@ -1,17 +1,16 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shipbay/models/accessory.dart';
-import 'package:shipbay/services/constants.dart';
+import 'package:shipbay/services/settings.dart';
 
 class Countries {
   String name;
   String code;
   String url;
-  Constants constants = Constants();
   Countries({this.name, this.code, this.url});
   Future<void> getData() async {
     try {
-      var response = await http.get("${constants.base_url}$url");
+      var response = await http.get("$baseUrl$url");
       Map data = jsonDecode(response.body);
       name = data['name'];
       code = data['code'];
@@ -24,10 +23,9 @@ class Countries {
 
 class Accessories {
   String url;
-  Constants constants = Constants();
   Accessories(this.url);
   Future<List<Accessory>> getData() async {
-    var response = await http.get("${constants.base_url}$url");
+    var response = await http.get("$baseUrl$url");
     var jsonData = jsonDecode(response.body);
     List<Accessory> accessories = [];
     for (var a in jsonData) {
