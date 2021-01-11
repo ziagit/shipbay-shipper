@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shipbay/pages/shared/progress.dart';
+import 'package:shipbay/pages/store/store.dart';
 import 'package:shipbay/services/settings.dart';
 
 class PickupServices extends StatefulWidget {
@@ -81,6 +82,7 @@ class _PickupServicesState extends State<PickupServices> {
                             backgroundColor: primary,
                             child: Icon(Icons.keyboard_arrow_right),
                             onPressed: () {
+                              save();
                               Navigator.pushReplacementNamed(
                                   context, '/pickup-date');
                             },
@@ -96,5 +98,15 @@ class _PickupServicesState extends State<PickupServices> {
         ],
       ),
     );
+  }
+
+  save() async {
+    Store store = Store();
+    await store.save('src-services', services);
+  }
+
+  read() async {
+    Store store = Store();
+    var data = await store.read('src-services');
   }
 }

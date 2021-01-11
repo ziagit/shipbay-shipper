@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shipbay/pages/shared/progress.dart';
+import 'package:shipbay/pages/store/store.dart';
 import 'package:shipbay/services/settings.dart';
 
 class PickupDate extends StatefulWidget {
@@ -9,52 +10,14 @@ class PickupDate extends StatefulWidget {
 
 class _PickupDateState extends State<PickupDate> {
   bool _isAppointment = false;
+  TextEditingController _dateController = TextEditingController();
+  TextEditingController _timeController = TextEditingController();
+
   DateTime _date = DateTime.now();
   TimeOfDay _time = TimeOfDay.now();
 
-  Future<Null> _selectDate(BuildContext context) async {
-    DateTime _datePicker = await showDatePicker(
-        context: context,
-        initialDate: _date,
-        firstDate: DateTime(2020),
-        lastDate: DateTime(2050),
-        builder: (BuildContext context, Widget child) {
-          return Theme(
-            data: ThemeData(
-              primarySwatch: Colors.deepOrange,
-            ),
-            child: child,
-          );
-        });
-    if (_datePicker != null && _datePicker != _date) {
-      setState(() {
-        _date = _datePicker;
-      });
-    }
-  }
-
-  Future<Null> _selectTime(BuildContext context) async {
-    TimeOfDay _timePicker = await showTimePicker(
-        context: context,
-        initialTime: _time,
-        builder: (context, child) {
-          return Theme(
-            data: ThemeData(
-              primarySwatch: Colors.deepOrange,
-            ),
-            child: child,
-          );
-        });
-    if (_timePicker != null && _timePicker != _time) {
-      setState(() {
-        _time = _timePicker;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    bool is_appointment = false;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: bgColor,
@@ -85,6 +48,7 @@ class _PickupDateState extends State<PickupDate> {
                       ),
                       SizedBox(height: 16.0),
                       TextFormField(
+                        controller: _dateController,
                         onTap: () {
                           _selectDate(context);
                         },
@@ -111,6 +75,7 @@ class _PickupDateState extends State<PickupDate> {
                       Visibility(
                         visible: _isAppointment,
                         child: TextFormField(
+                          controller: _timeController,
                           onTap: () {
                             _selectTime(context);
                           },
@@ -152,5 +117,56 @@ class _PickupDateState extends State<PickupDate> {
         ],
       ),
     );
+  }
+
+  Future<Null> _selectDate(BuildContext context) async {
+    DateTime _datePicker = await showDatePicker(
+        context: context,
+        initialDate: _date,
+        firstDate: DateTime(2020),
+        lastDate: DateTime(2050),
+        builder: (BuildContext context, Widget child) {
+          return Theme(
+            data: ThemeData(
+              primarySwatch: Colors.deepOrange,
+            ),
+            child: child,
+          );
+        });
+    if (_datePicker != null && _datePicker != _date) {
+      setState(() {
+        _date = _datePicker;
+      });
+    }
+  }
+
+  Future<Null> _selectTime(BuildContext context) async {
+    TimeOfDay _timePicker = await showTimePicker(
+        context: context,
+        initialTime: _time,
+        builder: (context, child) {
+          return Theme(
+            data: ThemeData(
+              primarySwatch: Colors.deepOrange,
+            ),
+            child: child,
+          );
+        });
+    if (_timePicker != null && _timePicker != _time) {
+      setState(() {
+        _time = _timePicker;
+      });
+    }
+  }
+
+  save() async {
+    PickupDate pickupDate = PickupDate();
+    Store store = Store();
+    await store.save('pickup-date', pickupDate);
+  }
+
+  read() async {
+    Store store = Store();
+    var data = await store.read('pickup-date');
   }
 }

@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
 import 'package:shipbay/models/accessory.dart';
-import 'package:shipbay/models/placePredictions.dart';
-import 'package:shipbay/pages/shared/divider.dart';
-import 'package:shipbay/pages/shared/prediction_tile.dart';
+import 'package:shipbay/models/pickup_address.dart';
+import 'package:shipbay/pages/shared/google_address.dart';
 import 'package:shipbay/pages/shared/progress.dart';
+import 'package:shipbay/pages/store/store.dart';
 import 'package:shipbay/services/settings.dart';
 import 'package:shipbay/services/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
 
@@ -18,10 +19,16 @@ class Pickup extends StatefulWidget {
 }
 
 class _PickupState extends State<Pickup> {
-  var _addressController;
-  List<PlacePredictions> placePredictionList = [];
-  String displayName = "";
+  PickupAddress addressLoad;
+  TextEditingController _addressController;
   String groupValue = 'bs';
+
+  String country;
+  String state;
+  String city;
+  String zip;
+  String street;
+  String street_number;
 
   @override
   Widget build(BuildContext context) {
@@ -59,33 +66,10 @@ class _PickupState extends State<Pickup> {
                         TextFormField(
                           controller: _addressController,
                           decoration: InputDecoration(hintText: 'Postal code'),
-                          onChanged: (val) {
-                            findPlace(val);
+                          onChanged: (keyword) {
+                            _openDialog(context, keyword);
                           },
                         ),
-
-                        //tile for predictions
-                        (placePredictionList.length > 0)
-                            ? Padding(
-                                padding: EdgeInsets.symmetric(
-                                    vertical: 8.0, horizontal: 16.0),
-                                child: ListView.separated(
-                                  padding: EdgeInsets.all(0.0),
-                                  itemBuilder: (context, index) {
-                                    return PredictionTile(
-                                      placePredictions:
-                                          placePredictionList[index],
-                                    );
-                                  },
-                                  separatorBuilder:
-                                      (BuildContext context, index) =>
-                                          DividerWidget(),
-                                  itemCount: placePredictionList.length,
-                                  shrinkWrap: true,
-                                  physics: ClampingScrollPhysics(),
-                                ),
-                              )
-                            : Container(),
                         SizedBox(height: 16.0),
                         Row(
                           children: <Widget>[
@@ -96,8 +80,9 @@ class _PickupState extends State<Pickup> {
                                     value: "bs",
                                     groupValue: groupValue,
                                     onChanged: (val) {
-                                      groupValue = val;
-                                      setState(() {});
+                                      setState(() {
+                                        groupValue = val;
+                                      });
                                     }),
                                 Text(
                                   "Business",
@@ -112,8 +97,9 @@ class _PickupState extends State<Pickup> {
                                     value: "rs",
                                     groupValue: groupValue,
                                     onChanged: (val) {
-                                      groupValue = val;
-                                      setState(() {});
+                                      setState(() {
+                                        groupValue = val;
+                                      });
                                     }),
                                 Text(
                                   "Residential",
@@ -128,8 +114,9 @@ class _PickupState extends State<Pickup> {
                                     value: "sp",
                                     groupValue: groupValue,
                                     onChanged: (val) {
-                                      groupValue = val;
-                                      setState(() {});
+                                      setState(() {
+                                        groupValue = val;
+                                      });
                                     }),
                                 Text(
                                   "Special location",
@@ -145,6 +132,7 @@ class _PickupState extends State<Pickup> {
                           backgroundColor: primary,
                           child: Icon(Icons.keyboard_arrow_right),
                           onPressed: () {
+                            save();
                             Navigator.pushReplacementNamed(
                                 context, '/pickup-services');
                           },
@@ -162,7 +150,77 @@ class _PickupState extends State<Pickup> {
   @override
   void initState() {
     super.initState();
-    getData();
+    read();
+  }
+
+  _openDialog(context, keyword) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0))),
+        content: Builder(
+          builder: (context) {
+            var height = MediaQuery.of(context).size.height;
+            var width = MediaQuery.of(context).size.width;
+            return Container(
+              height: height - 400,
+              width: width - 100,
+              child: GoogleAddress(selectedAddress: selected, keyword: keyword),
+            );
+          },
+        ),
+      ),
+    ).then(
+      (value) {},
+    );
+  }
+
+  save() async {
+    PickupAddress address = PickupAddress();
+    address.country = country;
+    address.state = state;
+    address.city = city;
+    address.zip = zip;
+    address.street = street;
+    address.street_number = street_number;
+    address.location_type = groupValue;
+    Store store = Store();
+    store.save('src', address);
+  }
+
+  read() async {
+    Store store = Store();
+    var data = await store.read('src');
+  }
+
+  addressDetails(placeId) async {
+    String placeDetailsUrl =
+        "https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$mapKey";
+    var res = await http.get(placeDetailsUrl);
+    Map data = jsonDecode(res.body);
+
+    for (var component in data['result']['address_components']) {
+      var types = component['types'];
+      if (types.indexOf("street_number") > -1) {
+        street_number = component['long_name'];
+      }
+      if (types.indexOf("route") > -1) {
+        street = component['long_name'];
+      }
+      if (types.indexOf("locality") > -1) {
+        city = component['long_name'];
+      }
+      if (types.indexOf("administrative_area_level_1") > -1) {
+        state = component['short_name'];
+      }
+      if (types.indexOf("postal_code") > -1) {
+        zip = component['long_name'];
+      }
+      if (types.indexOf("country") > -1) {
+        country = component['long_name'];
+      }
+    }
   }
 
   Future<List<Accessory>> _getAccessories() async {
@@ -170,27 +228,11 @@ class _PickupState extends State<Pickup> {
     return instance.getData();
   }
 
-  void getData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+  selected(selectedAddress) {
     setState(() {
-      displayName = prefs.getString('displayName');
+      _addressController =
+          TextEditingController(text: selectedAddress.description);
+      addressDetails(selectedAddress.place_id);
     });
-  }
-
-  void findPlace(String placeName) async {
-    if (placeName.length > 1) {
-      String autoComplete =
-          "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$placeName&key=$mapKey&sessiontoken=1234567890&components:ca";
-      var res = await http.get(autoComplete);
-      Map data = jsonDecode(res.body);
-      var predictions = data['predictions'];
-
-      var placesList = (predictions as List)
-          .map((e) => PlacePredictions.fromJson(e))
-          .toList();
-      setState(() {
-        placePredictionList = placesList;
-      });
-    }
   }
 }
