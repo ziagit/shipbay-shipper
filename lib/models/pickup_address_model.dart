@@ -1,15 +1,16 @@
-class PickupAddress {
+class PickupAddressModel {
   String country;
   String state;
   String city;
   String zip;
   String street;
   String street_number;
+  String formatted_address;
   String location_type;
 
-  PickupAddress();
+  PickupAddressModel();
 
-  PickupAddress.fromJson(Map<String, dynamic> json) {
+  PickupAddressModel.fromJson(Map<String, dynamic> json) {
     if (json['types'].indexOf("street_number") > -1) {
       street_number = json['long_name'];
     }
@@ -36,6 +37,7 @@ class PickupAddress {
         'zip': zip,
         'street': street,
         'street_number': street_number,
+        'formatted_address': formatted_address,
         'location_type': location_type
       };
 }

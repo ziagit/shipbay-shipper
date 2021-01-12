@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shipbay/pages/shared/progress.dart';
+import 'package:shipbay/pages/store/store.dart';
 import 'package:shipbay/services/settings.dart';
 
 class DeliveryServices extends StatefulWidget {
@@ -8,32 +9,15 @@ class DeliveryServices extends StatefulWidget {
 }
 
 class _DeliveryServicesState extends State<DeliveryServices> {
-  Map<String, bool> services = {
+  TextEditingController _timeController = TextEditingController();
+
+  Map<String, bool> _services = {
     'Inside pickup': false,
     'Tailgate': false,
     'Appointment': false,
   };
   bool _isAppointment = false;
-
   TimeOfDay _time = TimeOfDay.now();
-  Future<Null> _selectTime(BuildContext context) async {
-    TimeOfDay _timePicker = await showTimePicker(
-        context: context,
-        initialTime: _time,
-        builder: (context, child) {
-          return Theme(
-            data: ThemeData(
-              primarySwatch: Colors.deepOrange,
-            ),
-            child: child,
-          );
-        });
-    if (_timePicker != null && _timePicker != _time) {
-      setState(() {
-        _time = _timePicker;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,21 +52,21 @@ class _DeliveryServicesState extends State<DeliveryServices> {
                       SizedBox(height: 16.0),
                       ListView(
                         shrinkWrap: true,
-                        children: services.keys.map((String key) {
+                        children: _services.keys.map((String key) {
                           return new CheckboxListTile(
                             activeColor: primary,
                             title: new Text(
                               key,
                               style: TextStyle(fontSize: 11.0),
                             ),
-                            value: services[key],
+                            value: _services[key],
                             onChanged: (bool val) {
                               print("checkbox value: $key");
                               setState(() {
                                 if (key == "Appointment") {
                                   _isAppointment = !_isAppointment;
                                 }
-                                services[key] = val;
+                                _services[key] = val;
                               });
                             },
                           );
@@ -91,6 +75,7 @@ class _DeliveryServicesState extends State<DeliveryServices> {
                       Visibility(
                         visible: _isAppointment,
                         child: TextFormField(
+                          controller: _timeController,
                           onTap: () {
                             _selectTime(context);
                           },
@@ -117,6 +102,7 @@ class _DeliveryServicesState extends State<DeliveryServices> {
                             backgroundColor: primary,
                             child: Icon(Icons.keyboard_arrow_right),
                             onPressed: () {
+                              save();
                               Navigator.pushReplacementNamed(context, '/items');
                             },
                           ),
@@ -131,5 +117,67 @@ class _DeliveryServicesState extends State<DeliveryServices> {
         ],
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    read();
+  }
+
+  Future<Null> _selectTime(BuildContext context) async {
+    TimeOfDay _timePicker = await showTimePicker(
+        context: context,
+        initialTime: _time,
+        builder: (context, child) {
+          return Theme(
+            data: ThemeData(
+              primarySwatch: Colors.deepOrange,
+            ),
+            child: child,
+          );
+        });
+    if (_timePicker != null && _timePicker != _time) {
+      String stringFormat = _timeFormater(_timePicker);
+      setState(() {
+        _timeController.text = stringFormat;
+      });
+    }
+  }
+
+  String _timeFormater(_t) {
+    String _h = _t.hour < 10 ? "0" + _t.hour.toString() : _t.hour.toString();
+    String _m =
+        _t.minute < 10 ? "0" + _t.minute.toString() : _t.minute.toString();
+    String _ampm = _t.hour >= 12 ? 'pm' : 'am';
+    return "$_h:$_m $_ampm";
+  }
+
+  save() {
+    Store store = Store();
+    store.save('delivery-services', _services);
+    if (_services['Appointment']) {
+      store.save('delivery-appointment-time', _timeController.text);
+    } else {
+      store.remove('delivery-appointment-time');
+    }
+  }
+
+  read() async {
+    Store store = Store();
+    var data = await store.read('delivery-services');
+    var appointment = await store.read('delivery-appointment-time');
+
+    if (data != null) {
+      setState(() {
+        _services['Inside pickup'] = data['Inside pickup'];
+        _services['Tailgate'] = data['Tailgate'];
+        _services['Appointment'] = data['Appointment'];
+        _isAppointment = data['Appointment'];
+        if (appointment != null) {
+          _timeController.text = appointment;
+        }
+      });
+    }
   }
 }

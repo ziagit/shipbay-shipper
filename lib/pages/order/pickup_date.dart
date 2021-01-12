@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:shipbay/models/pickup_date_model.dart';
 import 'package:shipbay/pages/shared/progress.dart';
 import 'package:shipbay/pages/store/store.dart';
 import 'package:shipbay/services/settings.dart';
@@ -63,6 +65,9 @@ class _PickupDateState extends State<PickupDate> {
                             onChanged: (bool val) {
                               setState(() {
                                 _isAppointment = val;
+                                if (!val) {
+                                  _timeController.text = null;
+                                }
                               });
                             },
                           ),
@@ -102,6 +107,7 @@ class _PickupDateState extends State<PickupDate> {
                             backgroundColor: primary,
                             child: Icon(Icons.keyboard_arrow_right),
                             onPressed: () {
+                              save();
                               Navigator.pushReplacementNamed(
                                   context, '/delivery');
                             },
@@ -119,6 +125,13 @@ class _PickupDateState extends State<PickupDate> {
     );
   }
 
+  @override
+  void initState() {
+    read();
+
+    super.initState();
+  }
+
   Future<Null> _selectDate(BuildContext context) async {
     DateTime _datePicker = await showDatePicker(
         context: context,
@@ -134,8 +147,11 @@ class _PickupDateState extends State<PickupDate> {
           );
         });
     if (_datePicker != null && _datePicker != _date) {
+      DateFormat formater = DateFormat('yyyy-MM-dd');
+      String stringFormat = formater.format(_datePicker);
+
       setState(() {
-        _date = _datePicker;
+        _dateController = TextEditingController(text: stringFormat);
       });
     }
   }
@@ -153,20 +169,39 @@ class _PickupDateState extends State<PickupDate> {
           );
         });
     if (_timePicker != null && _timePicker != _time) {
+      String stringFormat = _timeFormater(_timePicker);
       setState(() {
-        _time = _timePicker;
+        _timeController = TextEditingController(text: stringFormat);
       });
     }
   }
 
+  String _timeFormater(_t) {
+    String _h = _t.hour < 10 ? "0" + _t.hour.toString() : _t.hour.toString();
+    String _m =
+        _t.minute < 10 ? "0" + _t.minute.toString() : _t.minute.toString();
+    String _ampm = _t.hour >= 12 ? 'pm' : 'am';
+    return "$_h:$_m $_ampm";
+  }
+
   save() async {
-    PickupDate pickupDate = PickupDate();
+    PickupDateModel pickupDateModel = PickupDateModel();
     Store store = Store();
-    await store.save('pickup-date', pickupDate);
+    pickupDateModel.date = _dateController.text;
+    pickupDateModel.time = _isAppointment ? _timeController.text : null;
+    pickupDateModel.is_appointment = _isAppointment;
+    await store.save('pickup-date', pickupDateModel);
   }
 
   read() async {
     Store store = Store();
     var data = await store.read('pickup-date');
+    if (data != null) {
+      setState(() {
+        _dateController.text = data['date'];
+        _timeController.text = data['time'];
+        _isAppointment = data['is_appointment'];
+      });
+    }
   }
 }

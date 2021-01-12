@@ -9,7 +9,7 @@ class PickupServices extends StatefulWidget {
 }
 
 class _PickupServicesState extends State<PickupServices> {
-  Map<String, bool> services = {
+  Map<String, bool> _services = {
     'Inside pickup': false,
     'Tailgate': false,
   };
@@ -46,17 +46,17 @@ class _PickupServicesState extends State<PickupServices> {
                       SizedBox(height: 16.0),
                       ListView(
                         shrinkWrap: true,
-                        children: services.keys.map((String key) {
+                        children: _services.keys.map((String key) {
                           return new CheckboxListTile(
                             activeColor: primary,
                             title: new Text(
                               key,
                               style: TextStyle(fontSize: 11.0),
                             ),
-                            value: services[key],
+                            value: _services[key],
                             onChanged: (bool val) {
                               setState(() {
-                                services[key] = val;
+                                _services[key] = val;
                               });
                             },
                           );
@@ -100,13 +100,24 @@ class _PickupServicesState extends State<PickupServices> {
     );
   }
 
-  save() async {
+  @override
+  void initState() {
+    super.initState();
+    read();
+  }
+
+  save() {
     Store store = Store();
-    await store.save('src-services', services);
+    store.save('pickup-services', _services);
   }
 
   read() async {
     Store store = Store();
-    var data = await store.read('src-services');
+    var data = await store.read('pickup-services');
+
+    setState(() {
+      _services['Inside pickup'] = data['Inside pickup'];
+      _services['Tailgate'] = data['Tailgate'];
+    });
   }
 }

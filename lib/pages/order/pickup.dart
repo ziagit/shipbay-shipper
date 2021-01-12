@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:shipbay/models/accessory.dart';
-import 'package:shipbay/models/pickup_address.dart';
+import 'package:shipbay/models/pickup_address_model.dart';
 import 'package:shipbay/pages/shared/google_address.dart';
 import 'package:shipbay/pages/shared/progress.dart';
 import 'package:shipbay/pages/store/store.dart';
 import 'package:shipbay/services/settings.dart';
 import 'package:shipbay/services/api.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
-import 'dart:convert';
 
 class Pickup extends StatefulWidget {
   @override
@@ -19,8 +18,7 @@ class Pickup extends StatefulWidget {
 }
 
 class _PickupState extends State<Pickup> {
-  PickupAddress addressLoad;
-  TextEditingController _addressController;
+  TextEditingController _addressController = TextEditingController();
   String groupValue = 'bs';
 
   String country;
@@ -29,6 +27,7 @@ class _PickupState extends State<Pickup> {
   String zip;
   String street;
   String street_number;
+  String formatted_address;
 
   @override
   Widget build(BuildContext context) {
@@ -149,8 +148,8 @@ class _PickupState extends State<Pickup> {
 
   @override
   void initState() {
-    super.initState();
     read();
+    super.initState();
   }
 
   _openDialog(context, keyword) {
@@ -177,21 +176,36 @@ class _PickupState extends State<Pickup> {
   }
 
   save() async {
-    PickupAddress address = PickupAddress();
-    address.country = country;
-    address.state = state;
-    address.city = city;
-    address.zip = zip;
-    address.street = street;
-    address.street_number = street_number;
-    address.location_type = groupValue;
+    PickupAddressModel pickupAddressModel = PickupAddressModel();
     Store store = Store();
-    store.save('src', address);
+    pickupAddressModel.country = country;
+    pickupAddressModel.state = state;
+    pickupAddressModel.city = city;
+    pickupAddressModel.zip = zip;
+    pickupAddressModel.street = street;
+    pickupAddressModel.street_number = street_number;
+    pickupAddressModel.formatted_address = formatted_address;
+    pickupAddressModel.location_type = groupValue;
+    await store.save('pickup', pickupAddressModel);
   }
 
   read() async {
     Store store = Store();
-    var data = await store.read('src');
+    var data = await store.read('pickup');
+    if (data != null) {
+      setState(() {
+        country = data['country'];
+        state = data['state'];
+        city = data['city'];
+        zip = data['zip'];
+        street = data['street'];
+        street_number = data['street_number'];
+        groupValue =
+            (data['location_type'] == null) ? 'bs' : data['location_type'];
+        formatted_address = data['formatted_address'];
+        _addressController.text = data['formatted_address'];
+      });
+    }
   }
 
   addressDetails(placeId) async {
@@ -221,6 +235,7 @@ class _PickupState extends State<Pickup> {
         country = component['long_name'];
       }
     }
+    formatted_address = data['result']['formatted_address'];
   }
 
   Future<List<Accessory>> _getAccessories() async {
@@ -229,10 +244,11 @@ class _PickupState extends State<Pickup> {
   }
 
   selected(selectedAddress) {
-    setState(() {
-      _addressController =
-          TextEditingController(text: selectedAddress.description);
-      addressDetails(selectedAddress.place_id);
-    });
+    if (selectedAddress.description != null) {
+      setState(() {
+        _addressController.text = selectedAddress.description;
+        addressDetails(selectedAddress.place_id);
+      });
+    }
   }
 }

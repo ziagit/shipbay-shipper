@@ -4,10 +4,10 @@ import 'dart:convert';
 class Store {
   read(String key) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.containsKey('src')) {
-      return json.decode(prefs.getString('src'));
+    if (prefs.containsKey(key)) {
+      return json.decode(prefs.getString(key));
     } else {
-      print("not exist............");
+      return null;
     }
   }
 
