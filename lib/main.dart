@@ -8,7 +8,6 @@ import 'package:shipbay/pages/order/carriers.dart';
 import 'package:shipbay/pages/order/delivery.dart';
 import 'package:shipbay/pages/order/delivery_services.dart';
 import 'package:shipbay/pages/order/items.dart';
-import 'package:shipbay/pages/order/order.dart';
 import 'package:shipbay/pages/order/payment_details.dart';
 import 'package:shipbay/pages/order/pickup.dart';
 import 'package:shipbay/pages/order/pickup_date.dart';
@@ -21,7 +20,6 @@ void main() => runApp(MaterialApp(
       routes: {
         '/': (_) => Loading(),
         '/home': (_) => Home(),
-        '/order': (_) => Order(),
         '/pickup': (_) => Pickup(),
         '/pickup-services': (_) => PickupServices(),
         '/pickup-date': (_) => PickupDate(),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shipbay/models/additional_details_model.dart';
 import 'package:shipbay/pages/shared/progress.dart';
+import 'package:shipbay/pages/store/store.dart';
 
 class AdditionalDetails extends StatefulWidget {
   @override
@@ -7,6 +9,14 @@ class AdditionalDetails extends StatefulWidget {
 }
 
 class _AdditionalDetailsState extends State<AdditionalDetails> {
+  TextEditingController _estimatedCostController = TextEditingController();
+  TextEditingController _instructionsController = TextEditingController();
+  TextEditingController _pickupNameController = TextEditingController();
+  TextEditingController _pickupPhoneController = TextEditingController();
+  TextEditingController _pickupEmailController = TextEditingController();
+  TextEditingController _deliveryNameController = TextEditingController();
+  TextEditingController _deliveryPhoneController = TextEditingController();
+  TextEditingController _deliveryEmailController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,10 +49,12 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
                       ),
                       SizedBox(height: 16.0),
                       TextFormField(
+                        controller: _estimatedCostController,
                         decoration: InputDecoration(
                             hintText: 'Estimated shipment value'),
                       ),
                       TextFormField(
+                        controller: _instructionsController,
                         decoration: InputDecoration(hintText: 'Instructions'),
                       ),
                       SizedBox(height: 24.0),
@@ -55,12 +67,15 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
                         title: Text("Pickup"),
                         children: <Widget>[
                           TextFormField(
+                            controller: _pickupNameController,
                             decoration: InputDecoration(hintText: 'Name'),
                           ),
                           TextFormField(
+                            controller: _pickupPhoneController,
                             decoration: InputDecoration(hintText: 'Phone'),
                           ),
                           TextFormField(
+                            controller: _pickupEmailController,
                             decoration: InputDecoration(hintText: 'Email'),
                           ),
                         ],
@@ -69,12 +84,15 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
                         title: Text("Delivery"),
                         children: <Widget>[
                           TextFormField(
+                            controller: _deliveryNameController,
                             decoration: InputDecoration(hintText: 'Name'),
                           ),
                           TextFormField(
+                            controller: _deliveryPhoneController,
                             decoration: InputDecoration(hintText: 'Phone'),
                           ),
                           TextFormField(
+                            controller: _deliveryEmailController,
                             decoration: InputDecoration(hintText: 'Email'),
                           ),
                         ],
@@ -98,6 +116,7 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
                             backgroundColor: Colors.orange[900],
                             child: Icon(Icons.keyboard_arrow_right),
                             onPressed: () {
+                              save();
                               Navigator.pushReplacementNamed(
                                   context, '/carriers');
                             },
@@ -113,5 +132,45 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
         ],
       ),
     );
+  }
+
+  @override
+  void initState() {
+    read();
+    super.initState();
+  }
+
+  read() async {
+    Store store = Store();
+    var data = await store.read('additional-details');
+    print(".........................");
+    print(data);
+    setState(() {
+      _estimatedCostController.text = data['estimated_cost'].toString();
+      _instructionsController.text = data['instructions'];
+      _pickupNameController.text = data['pickup_name'];
+      _pickupPhoneController.text = data['pickup_phone'].toString();
+      _pickupEmailController.text = data['pickup_email'];
+      _deliveryNameController.text = data['delivery_name'];
+      _deliveryPhoneController.text = data['delivery_phone'].toString();
+      _deliveryEmailController.text = data['delivery_email'];
+    });
+  }
+
+  save() {
+    Store store = Store();
+    AdditionalDetailsModel additionalDetailsModel = AdditionalDetailsModel();
+    additionalDetailsModel.estimated_cost =
+        double.parse(_estimatedCostController.text);
+    additionalDetailsModel.instructions = _instructionsController.text;
+    additionalDetailsModel.pickup_name = _pickupNameController.text;
+    additionalDetailsModel.pickup_phone =
+        int.parse(_pickupPhoneController.text);
+    additionalDetailsModel.pickup_email = _pickupEmailController.text;
+    additionalDetailsModel.delivery_name = _deliveryNameController.text;
+    additionalDetailsModel.delivery_phone =
+        int.parse(_deliveryPhoneController.text);
+    additionalDetailsModel.delivery_email = _deliveryEmailController.text;
+    store.save('additional-details', additionalDetailsModel);
   }
 }
