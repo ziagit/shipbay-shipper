@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
 import 'package:shipbay/models/item_model.dart';
 import 'package:shipbay/models/temperature.dart';
 import 'package:shipbay/pages/shared/progress.dart';
@@ -23,6 +22,7 @@ class _ItemsState extends State<Items> {
   TextEditingController _maxTempController = TextEditingController();
 
   bool _isTemperature = false;
+  Store store = Store();
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +61,6 @@ class _ItemsState extends State<Items> {
                           children: [
                             Container(
                               alignment: Alignment.topLeft,
-                              width: double.infinity,
                               padding: EdgeInsets.all(10.0),
                               decoration: BoxDecoration(
                                   color: Colors.white,
@@ -84,14 +83,16 @@ class _ItemsState extends State<Items> {
                                     children: [
                                       Row(
                                         children: [
-                                          Text(_items[index].description),
+                                          Text(_items[index].description,
+                                              style: TextStyle(fontSize: 12.0)),
                                           SizedBox(width: 20.0),
                                           Text(
-                                              "${_items[index].weight.toString()} Pounds"),
+                                              "${_items[index].weight.toString()} Pounds",
+                                              style: TextStyle(fontSize: 12.0)),
                                         ],
                                       ),
                                       IconButton(
-                                        icon: Icon(Icons.remove,
+                                        icon: Icon(Icons.remove_circle_outline,
                                             color: Colors.red),
                                         onPressed: () {
                                           remove(index);
@@ -233,7 +234,6 @@ class _ItemsState extends State<Items> {
   }
 
   read() async {
-    Store store = Store();
     var _savedItem = await store.read('items');
     setState(() {
       for (int i = 0; i < _savedItem.length; i++) {
@@ -262,16 +262,12 @@ class _ItemsState extends State<Items> {
     if (_isTemperature) {
       var temp = await store.read('temperature');
 
-      print("..........");
-      print(temp);
-
       _minTempController.text = temp['min_temp'].toString();
       _maxTempController.text = temp['max_temp'].toString();
     }
   }
 
   save() {
-    Store store = Store();
     store.save('items', _items);
     store.save('item-condition', _services);
 
@@ -307,7 +303,7 @@ class _AddItemState extends State<AddItem> {
         SizedBox(height: 16.0),
         TextFormField(
           controller: _descriptionController,
-          decoration: InputDecoration(hintText: 'Item description'),
+          decoration: InputDecoration(labelText: 'Item description'),
         ),
         DropdownButtonFormField<String>(
           value: dropdownValue,
@@ -334,21 +330,24 @@ class _AddItemState extends State<AddItem> {
             Flexible(
               child: TextFormField(
                 controller: _lengthController,
-                decoration: InputDecoration(hintText: 'Length'),
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(labelText: 'Length'),
                 style: TextStyle(fontSize: 12.0),
               ),
             ),
             Flexible(
               child: TextFormField(
                 controller: _widthController,
-                decoration: InputDecoration(hintText: 'Width'),
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(labelText: 'Width'),
                 style: TextStyle(fontSize: 12.0),
               ),
             ),
             Flexible(
               child: TextFormField(
                 controller: _heightController,
-                decoration: InputDecoration(hintText: 'Height'),
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(labelText: 'Height'),
                 style: TextStyle(fontSize: 12.0),
               ),
             )
@@ -359,6 +358,7 @@ class _AddItemState extends State<AddItem> {
             Flexible(
               child: TextFormField(
                 controller: _weightController,
+                keyboardType: TextInputType.number,
                 decoration: InputDecoration(hintText: 'Weight'),
                 style: TextStyle(fontSize: 12.0),
               ),
@@ -366,6 +366,7 @@ class _AddItemState extends State<AddItem> {
             Flexible(
               child: TextFormField(
                 controller: _numberController,
+                keyboardType: TextInputType.number,
                 decoration: InputDecoration(hintText: 'Number of items'),
                 style: TextStyle(fontSize: 12.0),
               ),

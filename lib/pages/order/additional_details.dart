@@ -68,15 +68,20 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
                         children: <Widget>[
                           TextFormField(
                             controller: _pickupNameController,
-                            decoration: InputDecoration(hintText: 'Name'),
+                            decoration: InputDecoration(
+                              labelText: 'Name',
+                            ),
+                            style: TextStyle(fontSize: 12.0),
                           ),
                           TextFormField(
                             controller: _pickupPhoneController,
-                            decoration: InputDecoration(hintText: 'Phone'),
+                            decoration: InputDecoration(labelText: 'Phone'),
+                            style: TextStyle(fontSize: 12.0),
                           ),
                           TextFormField(
                             controller: _pickupEmailController,
-                            decoration: InputDecoration(hintText: 'Email'),
+                            decoration: InputDecoration(labelText: 'Email'),
+                            style: TextStyle(fontSize: 12.0),
                           ),
                         ],
                       ),
@@ -85,15 +90,18 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
                         children: <Widget>[
                           TextFormField(
                             controller: _deliveryNameController,
-                            decoration: InputDecoration(hintText: 'Name'),
+                            decoration: InputDecoration(labelText: 'Name'),
+                            style: TextStyle(fontSize: 12.0),
                           ),
                           TextFormField(
                             controller: _deliveryPhoneController,
-                            decoration: InputDecoration(hintText: 'Phone'),
+                            decoration: InputDecoration(labelText: 'Phone'),
+                            style: TextStyle(fontSize: 12.0),
                           ),
                           TextFormField(
                             controller: _deliveryEmailController,
-                            decoration: InputDecoration(hintText: 'Email'),
+                            decoration: InputDecoration(labelText: 'Email'),
+                            style: TextStyle(fontSize: 12.0),
                           ),
                         ],
                       ),
@@ -143,8 +151,6 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
   read() async {
     Store store = Store();
     var data = await store.read('additional-details');
-    print(".........................");
-    print(data);
     setState(() {
       _estimatedCostController.text = data['estimated_cost'].toString();
       _instructionsController.text = data['instructions'];

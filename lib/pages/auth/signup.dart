@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:shipbay/pages/store/store.dart';
+import 'package:shipbay/services/api.dart';
+import 'package:shipbay/services/settings.dart';
 
 class Signup extends StatefulWidget {
   @override
@@ -6,6 +11,12 @@ class Signup extends StatefulWidget {
 }
 
 class _SignupState extends State<Signup> {
+  bool _isLoading = false;
+  TextEditingController _nameController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+  TextEditingController _confirmPasswordController = TextEditingController();
+  String _role = 'shipper';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,16 +55,21 @@ class _SignupState extends State<Signup> {
                     child: Column(
                   children: <Widget>[
                     TextFormField(
-                      decoration: InputDecoration(hintText: 'Name'),
+                      controller: _nameController,
+                      decoration: InputDecoration(labelText: 'Name'),
                     ),
                     TextFormField(
-                      decoration: InputDecoration(hintText: 'Email'),
+                      controller: _emailController,
+                      decoration: InputDecoration(labelText: 'Email'),
                     ),
                     TextFormField(
-                      decoration: InputDecoration(hintText: 'Password'),
+                      controller: _passwordController,
+                      decoration: InputDecoration(labelText: 'Password'),
                     ),
                     TextFormField(
-                      decoration: InputDecoration(hintText: 'Confirm password'),
+                      controller: _confirmPasswordController,
+                      decoration:
+                          InputDecoration(labelText: 'Confirm password'),
                     ),
                     SizedBox(height: 60.0),
                     SizedBox(
@@ -69,8 +85,15 @@ class _SignupState extends State<Signup> {
                         shape: RoundedRectangleBorder(
                             borderRadius: new BorderRadius.circular(30.0)),
                         onPressed: () {
-                          //;
+                          _register(context);
                         },
+                      ),
+                    ),
+                    SizedBox(height: 10.0),
+                    Visibility(
+                      visible: _isLoading,
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(primary),
                       ),
                     ),
                     Row(
@@ -100,5 +123,27 @@ class _SignupState extends State<Signup> {
       ),
       // child: Text("This is where your content goes")
     );
+  }
+
+  Future<Map<String, dynamic>> _register(context) async {
+    setState(() {
+      _isLoading = true;
+    });
+    print(_isLoading);
+    Register instance = Register(
+        _nameController.text,
+        _emailController.text,
+        _passwordController.text,
+        _confirmPasswordController.text,
+        _role,
+        context);
+    instance.register().then((response) => {}).whenComplete(
+          () => {
+            setState(() {
+              _isLoading = false;
+            }),
+            Navigator.pushReplacementNamed(context, '/welcome'),
+          },
+        );
   }
 }

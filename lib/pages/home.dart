@@ -74,6 +74,7 @@ class _HomeState extends State<Home> {
                       ],
                     ),
                     child: TextFormField(
+                      style: TextStyle(fontSize: 14.0),
                       decoration: InputDecoration(
                         contentPadding: const EdgeInsets.symmetric(
                             vertical: 12.0, horizontal: 16.0),

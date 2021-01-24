@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shipbay/services/api.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:shipbay/services/settings.dart';
 
 class Loading extends StatefulWidget {
   @override
@@ -9,26 +10,27 @@ class Loading extends StatefulWidget {
 class _LoadingState extends State<Loading> {
   String name = 'Loading';
 
-  void setupCountries() async {
-    Countries instance =
-        Countries(name: 'Canada', code: 'CA', url: 'countries/1');
-    await instance.getData();
-    Navigator.pushReplacementNamed(context, '/home',
-        arguments: {'name': instance.name, 'code': instance.code});
+  void getCards() {
+    Future.delayed(Duration(seconds: 4), () {
+      Navigator.pushReplacementNamed(context, '/home');
+    });
   }
 
   @override
   void initState() {
     super.initState();
-    setupCountries();
+    getCards();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Padding(
-      padding: EdgeInsets.all(50.0),
-      child: Text(name),
-    ));
+      body: Center(
+        child: SpinKitFadingCircle(
+          color: primary,
+          size: 80.0,
+        ),
+      ),
+    );
   }
 }

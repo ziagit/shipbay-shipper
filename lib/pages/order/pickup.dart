@@ -18,6 +18,7 @@ class Pickup extends StatefulWidget {
 }
 
 class _PickupState extends State<Pickup> {
+  Store store = Store();
   TextEditingController _addressController = TextEditingController();
   String groupValue = 'bs';
 
@@ -177,7 +178,6 @@ class _PickupState extends State<Pickup> {
 
   save() async {
     PickupAddressModel pickupAddressModel = PickupAddressModel();
-    Store store = Store();
     pickupAddressModel.country = country;
     pickupAddressModel.state = state;
     pickupAddressModel.city = city;
@@ -190,7 +190,6 @@ class _PickupState extends State<Pickup> {
   }
 
   read() async {
-    Store store = Store();
     var data = await store.read('pickup');
     if (data != null) {
       setState(() {

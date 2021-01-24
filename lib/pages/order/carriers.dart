@@ -1,8 +1,11 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:shipbay/models/carrier_model.dart';
 import 'package:shipbay/pages/shared/progress.dart';
 import 'package:shipbay/pages/store/store.dart';
+import 'dart:convert';
+import 'package:http/http.dart';
+import 'package:shipbay/services/settings.dart';
+import 'package:smooth_star_rating/smooth_star_rating.dart';
 
 class Carriers extends StatefulWidget {
   @override
@@ -12,11 +15,22 @@ class Carriers extends StatefulWidget {
 class _CarriersState extends State<Carriers> {
   String _src_city;
   String _des_city;
+  Map order = {};
+  List carriers;
+  Store store = Store();
+
+  double _rating;
+  double _userRating = 3.0;
+  int _ratingBarMode = 1;
+  bool _isRTLMode = false;
+  bool _isVertical = false;
+  IconData _selectedIcon;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xF8FAF8),
+        backgroundColor: bgColor,
         elevation: 0.0,
         leading: IconButton(
           icon: Icon(
@@ -47,31 +61,120 @@ class _CarriersState extends State<Carriers> {
                   ),
                 ),
                 SizedBox(height: 16.0),
-                Container(
-                  child: Card(
-                    child: Column(
-                      children: <Widget>[
-                        ListTile(
-                          leading: Image(
-                            image: AssetImage('assets/images/coffeequery.png'),
-                          ),
-                          title: Text("Carrier"),
-                          subtitle: Text("Read more about this carrier"),
-                        ),
-                        ButtonBar(
-                          children: <Widget>[
-                            FlatButton(
-                              child: Text('Select'),
-                              onPressed: () {
-                                Navigator.pushReplacementNamed(
-                                    context, '/signin');
-                              },
+                FutureBuilder(
+                  future: _getCarriers(),
+                  builder: (BuildContext context, AsyncSnapshot snapshot) {
+                    if (snapshot.data == null) {
+                      return Container(
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Center(
+                              child: Text("Loading..."),
                             ),
-                          ],
+                          ),
                         ),
-                      ],
-                    ),
-                  ),
+                      );
+                    } else {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: snapshot.data.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return ListTile(
+                            title: Container(
+                              child: Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          CircleAvatar(
+                                            backgroundColor: Colors.grey[200],
+                                            backgroundImage: AssetImage(
+                                                'assets/images/coffeequery.png'),
+                                          ),
+                                          SizedBox(width: 5.0),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                snapshot.data[index].company,
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              SizedBox(
+                                                width: 150.0,
+                                                child: Text(
+                                                  "Read more about this carrier",
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style:
+                                                      TextStyle(fontSize: 12.0),
+                                                ),
+                                              ),
+                                              SizedBox(height: 16.0),
+                                              SmoothStarRating(
+                                                  starCount: 5,
+                                                  rating: snapshot
+                                                          .data[index].rates +
+                                                      .0,
+                                                  size: 16.0,
+                                                  isReadOnly: true,
+                                                  color: Colors.orange,
+                                                  borderColor: Colors.orange,
+                                                  spacing: 0.0)
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              IconButton(
+                                                icon: Icon(Icons.info,
+                                                    color: Colors.blue),
+                                                onPressed: () {},
+                                              ),
+                                              Text(
+                                                  "\$${snapshot.data[index].price.toStringAsFixed(2)}",
+                                                  style:
+                                                      TextStyle(fontSize: 12.0))
+                                            ],
+                                          ),
+                                          OutlineButton(
+                                            borderSide: BorderSide(
+                                                color: primary, width: 0.5),
+                                            child: Text(
+                                              "Select",
+                                              style: TextStyle(fontSize: 12.0),
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(30.0),
+                                            ),
+                                            onPressed: () {
+                                              _next(context,
+                                                  snapshot.data[index]);
+                                            },
+                                          ),
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    }
+                  },
                 )
               ],
             ),
@@ -84,11 +187,11 @@ class _CarriersState extends State<Carriers> {
   @override
   void initState() {
     read();
+    initOrder();
     super.initState();
   }
 
   read() async {
-    Store store = Store();
     var pickup = await store.read('pickup');
     var delivery = await store.read('delivery');
     if (pickup != null && delivery != null) {
@@ -97,12 +200,9 @@ class _CarriersState extends State<Carriers> {
         _des_city = delivery['city'];
       });
     }
-    makeOrder();
   }
 
-  makeOrder() async {
-    Map order = {};
-    Store store = Store();
+  initOrder() async {
     var pickup = await store.read('pickup');
     var delivery = await store.read('delivery');
     var items = await store.read('items');
@@ -112,7 +212,6 @@ class _CarriersState extends State<Carriers> {
     var deliveryAppointmentTime = await store.read('delivery-appointment-time');
     var itemConditions = await store.read('item-condition');
     var itemTemperature = await store.read('temperature');
-    print(itemTemperature['max_temp']);
     order['src'] = pickup;
     order['src']['accessories'] = [];
     order['src']['accessories'].add(pickup['location_type']);
@@ -158,8 +257,49 @@ class _CarriersState extends State<Carriers> {
       order['myItem']['maxTemp'] = itemTemperature['max_temp'].toString();
       order['myItem']['minTemp'] = itemTemperature['min_temp'].toString();
     }
+  }
 
-    print("okh fuck.................");
-    print(order);
+  Future<List<Carrier>> _getCarriers() async {
+    Response response = await post(
+      "http://192.168.2.19:8000/api/carriers-rate",
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(<String, Object>{
+        "src": order['src'],
+        "pickDate": order['pickDate'],
+        "des": order['des'],
+        "myItem": order['myItem'],
+      }),
+    );
+
+    var jsonData = jsonDecode(response.body);
+    List<Carrier> carriers = [];
+    for (int i = 0; i < jsonData.length; i++) {
+      Carrier carrier = Carrier(
+          i + 1,
+          jsonData[i]['first_name'],
+          jsonData[i]['last_name'],
+          jsonData[i]['phone'],
+          jsonData[i]['price'],
+          jsonData[i]['company'],
+          jsonData[i]['detail'],
+          jsonData[i]['rates'],
+          jsonData[i]['website'],
+          jsonData[i]['logo']);
+      carriers.add(carrier);
+    }
+    return carriers;
+  }
+
+  _next(context, carrier) async {
+    store.save('carrier', carrier);
+    String token = await store.read('token');
+    if (token != null) {
+      print(token);
+      Navigator.pushReplacementNamed(context, '/payment-details');
+    } else {
+      Navigator.pushReplacementNamed(context, '/signin');
+    }
   }
 }
