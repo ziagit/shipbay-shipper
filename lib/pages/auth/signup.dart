@@ -17,6 +17,7 @@ class _SignupState extends State<Signup> {
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _confirmPasswordController = TextEditingController();
   String _role = 'shipper';
+  final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,70 +53,100 @@ class _SignupState extends State<Signup> {
                   style: TextStyle(fontSize: 24.0),
                 ),
                 Form(
+                    key: _formKey,
                     child: Column(
-                  children: <Widget>[
-                    TextFormField(
-                      controller: _nameController,
-                      decoration: InputDecoration(labelText: 'Name'),
-                    ),
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: InputDecoration(labelText: 'Email'),
-                    ),
-                    TextFormField(
-                      controller: _passwordController,
-                      decoration: InputDecoration(labelText: 'Password'),
-                    ),
-                    TextFormField(
-                      controller: _confirmPasswordController,
-                      decoration:
-                          InputDecoration(labelText: 'Confirm password'),
-                    ),
-                    SizedBox(height: 60.0),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 46.0,
-                      child: RaisedButton(
-                        color: Colors.orange[900],
-                        child: Text(
-                          "Signup",
-                          style: TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.w600),
-                        ),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(30.0)),
-                        onPressed: () {
-                          _register(context);
-                        },
-                      ),
-                    ),
-                    SizedBox(height: 10.0),
-                    Visibility(
-                      visible: _isLoading,
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(primary),
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        SizedBox(width: 1.0),
-                        FlatButton(
-                          onPressed: () {
-                            Navigator.pushReplacementNamed(context, '/signin');
+                        TextFormField(
+                          controller: _nameController,
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter a valid name';
+                            }
+                            return null;
                           },
-                          child: Text(
-                            'Signin',
-                            style: TextStyle(color: Colors.orange[900]),
+                          decoration: InputDecoration(labelText: 'Name'),
+                        ),
+                        TextFormField(
+                          controller: _emailController,
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter a valid email';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(labelText: 'Email'),
+                        ),
+                        TextFormField(
+                          controller: _passwordController,
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter a valid password';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(labelText: 'Password'),
+                        ),
+                        TextFormField(
+                          controller: _confirmPasswordController,
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter a valid password';
+                            }
+                            return null;
+                          },
+                          decoration:
+                              InputDecoration(labelText: 'Confirm password'),
+                        ),
+                        SizedBox(height: 60.0),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 46.0,
+                          child: RaisedButton(
+                            color: Colors.orange[900],
+                            child: Text(
+                              "Signup",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(30.0)),
+                            onPressed: () {
+                              if (_formKey.currentState.validate()) {
+                                _register(context);
+                              }
+                            },
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(30.0),
+                        ),
+                        SizedBox(height: 10.0),
+                        Visibility(
+                          visible: _isLoading,
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(primary),
                           ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            SizedBox(width: 1.0),
+                            FlatButton(
+                              onPressed: () {
+                                Navigator.pushReplacementNamed(
+                                    context, '/signin');
+                              },
+                              child: Text(
+                                'Signin',
+                                style:
+                                    TextStyle(color: primary, fontSize: 12.0),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(30.0),
+                              ),
+                            )
+                          ],
                         )
                       ],
-                    )
-                  ],
-                ))
+                    ))
               ],
             ),
           )

@@ -11,12 +11,16 @@ class PickupDate extends StatefulWidget {
 }
 
 class _PickupDateState extends State<PickupDate> {
+  Store store = Store();
+
   bool _isAppointment = false;
   TextEditingController _dateController = TextEditingController();
   TextEditingController _timeController = TextEditingController();
 
   DateTime _date = DateTime.now();
   TimeOfDay _time = TimeOfDay.now();
+  final _formKey = GlobalKey<FormState>();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -37,84 +41,95 @@ class _PickupDateState extends State<PickupDate> {
       body: ListView(
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.all(30.0),
+            padding: const EdgeInsets.all(20.0),
             child: Column(
               children: <Widget>[
                 Container(child: Progress(progress: 25.0)),
                 Container(
-                  child: Column(
-                    children: <Widget>[
-                      Text(
-                        "When to pickup?",
-                        style: TextStyle(fontSize: 24.0, height: 2.0),
-                      ),
-                      SizedBox(height: 16.0),
-                      TextFormField(
-                        controller: _dateController,
-                        onTap: () {
-                          _selectDate(context);
-                        },
-                        decoration: InputDecoration(hintText: 'Select a date'),
-                      ),
-                      SizedBox(height: 16.0),
-                      Row(
-                        children: <Widget>[
-                          Checkbox(
-                            activeColor: primary,
-                            value: _isAppointment,
-                            onChanged: (bool val) {
-                              setState(() {
-                                _isAppointment = val;
-                                if (!val) {
-                                  _timeController.text = null;
-                                }
-                              });
-                            },
-                          ),
-                          Text(
-                            "Appointment",
-                            style: TextStyle(fontSize: 11.0),
-                          ),
-                        ],
-                      ),
-                      Visibility(
-                        visible: _isAppointment,
-                        child: TextFormField(
-                          controller: _timeController,
-                          onTap: () {
-                            _selectTime(context);
-                          },
-                          decoration: InputDecoration(hintText: 'Select time'),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: <Widget>[
+                        Text(
+                          "When to pickup?",
+                          style: TextStyle(fontSize: 22.0, height: 2.0),
                         ),
-                      ),
-                      SizedBox(height: 16.0),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          FloatingActionButton(
-                            heroTag: 0,
-                            backgroundColor: inActive,
-                            foregroundColor: primary,
-                            child: Icon(Icons.keyboard_arrow_left),
-                            onPressed: () {
-                              Navigator.pushReplacementNamed(
-                                  context, '/pickup-services');
+                        SizedBox(height: 16.0),
+                        TextFormField(
+                          controller: _dateController,
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter a valid address';
+                            }
+                            return null;
+                          },
+                          decoration:
+                              InputDecoration(hintText: 'Select a date'),
+                          onTap: () {
+                            _selectDate(context);
+                          },
+                        ),
+                        SizedBox(height: 16.0),
+                        Row(
+                          children: <Widget>[
+                            Checkbox(
+                              activeColor: primary,
+                              value: _isAppointment,
+                              onChanged: (bool val) {
+                                setState(() {
+                                  _isAppointment = val;
+                                  if (!val) {
+                                    _timeController.text = null;
+                                  }
+                                });
+                              },
+                            ),
+                            Text(
+                              "Appointment",
+                              style: TextStyle(fontSize: 11.0),
+                            ),
+                          ],
+                        ),
+                        Visibility(
+                          visible: _isAppointment,
+                          child: TextFormField(
+                            controller: _timeController,
+                            onTap: () {
+                              _selectTime(context);
                             },
+                            decoration:
+                                InputDecoration(hintText: 'Select time'),
                           ),
-                          SizedBox(width: 16.0),
-                          FloatingActionButton(
-                            heroTag: 1,
-                            backgroundColor: primary,
-                            child: Icon(Icons.keyboard_arrow_right),
-                            onPressed: () {
-                              save();
-                              Navigator.pushReplacementNamed(
-                                  context, '/delivery');
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
+                        ),
+                        SizedBox(height: 16.0),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            FloatingActionButton(
+                              heroTag: 0,
+                              backgroundColor: inActive,
+                              foregroundColor: primary,
+                              child: Icon(Icons.keyboard_arrow_left),
+                              onPressed: () {
+                                Navigator.pushReplacementNamed(
+                                    context, '/pickup-services');
+                              },
+                            ),
+                            SizedBox(width: 16.0),
+                            FloatingActionButton(
+                              heroTag: 1,
+                              backgroundColor: primary,
+                              child: Icon(Icons.keyboard_arrow_right),
+                              onPressed: () {
+                                if (_formKey.currentState.validate()) {
+                                  _next(context);
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -127,8 +142,7 @@ class _PickupDateState extends State<PickupDate> {
 
   @override
   void initState() {
-    read();
-
+    _init();
     super.initState();
   }
 
@@ -184,17 +198,16 @@ class _PickupDateState extends State<PickupDate> {
     return "$_h:$_m $_ampm";
   }
 
-  save() async {
+  _next(context) async {
     PickupDateModel pickupDateModel = PickupDateModel();
-    Store store = Store();
     pickupDateModel.date = _dateController.text;
     pickupDateModel.time = _isAppointment ? _timeController.text : null;
     pickupDateModel.is_appointment = _isAppointment;
     await store.save('pickup-date', pickupDateModel);
+    Navigator.pushReplacementNamed(context, '/delivery');
   }
 
-  read() async {
-    Store store = Store();
+  _init() async {
     var data = await store.read('pickup-date');
     if (data != null) {
       setState(() {

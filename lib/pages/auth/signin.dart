@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shipbay/pages/store/store.dart';
 import 'package:shipbay/services/api.dart';
 import 'package:shipbay/services/settings.dart';
 
@@ -11,6 +12,7 @@ class _SigninState extends State<Signin> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
+  final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,74 +51,101 @@ class _SigninState extends State<Signin> {
                   height: 16.0,
                 ),
                 Form(
+                    key: _formKey,
                     child: Column(
-                  children: <Widget>[
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: InputDecoration(labelText: 'Username'),
-                    ),
-                    TextFormField(
-                      controller: _passwordController,
-                      decoration: InputDecoration(labelText: 'Password'),
-                    ),
-                    SizedBox(height: 8.0),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        SizedBox(width: 1.0),
-                        FlatButton(
-                          child: Text("Forget password"),
-                          onPressed: () {},
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 24.0),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 46.0,
-                      child: RaisedButton(
-                        color: Colors.orange[900],
-                        child: Text(
-                          "Login",
-                          style: TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.w600),
-                        ),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(30.0)),
-                        onPressed: () {
-                          _login(context);
-                        },
-                      ),
-                    ),
-                    Visibility(
-                      visible: _isLoading,
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(primary),
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        FlatButton(
-                          onPressed: () {
-                            Navigator.pushReplacementNamed(
-                                context, '/payment-details');
+                        TextFormField(
+                          controller: _emailController,
+                          decoration: InputDecoration(labelText: 'Username'),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter a valid email';
+                            }
+                            return null;
                           },
-                          child: Text("Continue as guest"),
                         ),
-                        FlatButton(
-                          child: Text(
-                            "Register",
-                            style: TextStyle(color: Colors.orange[900]),
+                        TextFormField(
+                          controller: _passwordController,
+                          enableSuggestions: false,
+                          autocorrect: false,
+                          obscureText: true,
+                          decoration: InputDecoration(labelText: 'Password'),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter a valid password';
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 8.0),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            SizedBox(width: 1.0),
+                            FlatButton(
+                              child: Text("Forget password",
+                                  style: TextStyle(
+                                      fontSize: 12.0, color: Colors.blue)),
+                              onPressed: () {},
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 24.0),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 46.0,
+                          child: RaisedButton(
+                            color: Colors.orange[900],
+                            child: Text(
+                              "Login",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(30.0)),
+                            onPressed: () {
+                              if (_formKey.currentState.validate()) {
+                                _login(context);
+                              }
+                            },
                           ),
-                          onPressed: () {
-                            Navigator.pushReplacementNamed(context, '/signup');
-                          },
+                        ),
+                        Visibility(
+                          visible: _isLoading,
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(primary),
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Visibility(
+                              visible: true,
+                              child: FlatButton(
+                                onPressed: () {
+                                  Navigator.pushReplacementNamed(
+                                      context, '/payment-details');
+                                },
+                                child: Text("Continue as guest",
+                                    style: TextStyle(fontSize: 12.0)),
+                              ),
+                            ),
+                            FlatButton(
+                              child: Text(
+                                "Register",
+                                style:
+                                    TextStyle(color: primary, fontSize: 12.0),
+                              ),
+                              onPressed: () {
+                                Navigator.pushReplacementNamed(
+                                    context, '/signup');
+                              },
+                            ),
+                          ],
                         ),
                       ],
-                    ),
-                  ],
-                ))
+                    ))
               ],
             ),
           ),
@@ -124,6 +153,21 @@ class _SigninState extends State<Signin> {
       ),
       // child: Text("This is where your content goes")
     );
+  }
+
+  @override
+  void initState() {
+    _pendingOrder();
+    super.initState();
+  }
+
+  _pendingOrder() async {
+    Store store = Store();
+    var data = store.read('pickup');
+    if (data != null) {
+      return true;
+    }
+    return false;
   }
 
   Future<Map<String, dynamic>> _login(context) async {

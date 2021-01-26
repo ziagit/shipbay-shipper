@@ -1,6 +1,6 @@
 class ItemModel {
   String description;
-  String type;
+  int type;
   double length;
   double width;
   double height;

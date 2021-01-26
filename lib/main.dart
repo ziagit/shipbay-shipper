@@ -6,6 +6,7 @@ import 'package:shipbay/pages/home.dart';
 import 'package:shipbay/pages/loading.dart';
 import 'package:shipbay/pages/order/additional_details.dart';
 import 'package:shipbay/pages/order/carriers.dart';
+import 'package:shipbay/pages/order/completed.dart';
 import 'package:shipbay/pages/order/confirmation.dart';
 import 'package:shipbay/pages/order/delivery.dart';
 import 'package:shipbay/pages/order/delivery_services.dart';
@@ -14,7 +15,12 @@ import 'package:shipbay/pages/order/payment_details.dart';
 import 'package:shipbay/pages/order/pickup.dart';
 import 'package:shipbay/pages/order/pickup_date.dart';
 import 'package:shipbay/pages/order/pickup_services.dart';
-import 'package:shipbay/pages/shipper/shipper.dart';
+import 'package:shipbay/pages/shipper/acount.dart';
+import 'package:shipbay/pages/shipper/card_details.dart';
+import 'package:shipbay/pages/shipper/order_details.dart';
+import 'package:shipbay/pages/shipper/orders.dart';
+import 'package:shipbay/pages/shipper/profile.dart';
+import 'package:shipbay/pages/tracking/tracking.dart';
 
 void main() => runApp(MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -32,9 +38,15 @@ void main() => runApp(MaterialApp(
         '/carriers': (_) => Carriers(),
         '/payment-details': (_) => PaymentDetails(),
         '/confirm': (_) => Confirmation(),
+        '/completed': (_) => Completed(),
         '/welcome': (_) => Welcome(),
         '/signin': (_) => Signin(),
         '/signup': (_) => Signup(),
-        '/shipper': (_) => Shipper()
+        '/track': (_) => Tracking(),
+        '/acount': (_) => Acount(),
+        '/profile': (_) => Profile(),
+        '/orders': (_) => Orders(),
+        '/order-details': (_) => OrderDetails(),
+        '/card': (_) => CardDetails()
       },
     ));

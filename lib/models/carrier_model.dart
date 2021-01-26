@@ -1,32 +1,32 @@
 class Carrier {
-  int index;
+  int id;
   String first_name;
   String last_name;
   String phone;
   double price;
   String company;
   String detail;
-  int rates;
+  double rates;
   String website;
   String logo;
 
-  Carrier(this.index, this.first_name, this.last_name, this.phone, this.price,
+  Carrier(this.id, this.first_name, this.last_name, this.phone, this.price,
       this.company, this.detail, this.rates, this.website, this.logo);
 
   Carrier.fromJson(Map<String, dynamic> json) {
-    index = json['index'];
+    id = json['id'];
     first_name = json['first_name'];
     last_name = json['last_name'];
     phone = json['phone'];
-    price = json['price'];
+    price = json['price'].toDouble();
     company = json['company'];
     detail = json['detail'];
-    rates = json['rates'];
+    rates = json['rates'].toDouble();
     website = json['website'];
     logo = json['logo'];
   }
   Map<String, dynamic> toJson() => {
-        'index': index,
+        'id': id,
         'first_name': first_name,
         'last_name': last_name,
         'phone': phone,

@@ -32,7 +32,7 @@ class _PickupServicesState extends State<PickupServices> {
       body: ListView(
         children: <Widget>[
           Container(
-            padding: const EdgeInsets.all(30.0),
+            padding: const EdgeInsets.all(20.0),
             child: Column(
               children: <Widget>[
                 SizedBox(child: Progress(progress: 12.0)),
@@ -41,24 +41,25 @@ class _PickupServicesState extends State<PickupServices> {
                     children: <Widget>[
                       Text(
                         "Pickup services",
-                        style: TextStyle(fontSize: 24.0, height: 2.0),
+                        style: TextStyle(fontSize: 22.0, height: 2.0),
                       ),
                       SizedBox(height: 16.0),
                       ListView(
                         shrinkWrap: true,
                         children: _services.keys.map((String key) {
-                          return new CheckboxListTile(
+                          return CheckboxListTile(
+                            controlAffinity: ListTileControlAffinity.leading,
                             activeColor: primary,
-                            title: new Text(
-                              key,
-                              style: TextStyle(fontSize: 11.0),
-                            ),
                             value: _services[key],
                             onChanged: (bool val) {
                               setState(() {
                                 _services[key] = val;
                               });
                             },
+                            title: Text(
+                              key,
+                              style: TextStyle(fontSize: 11.0),
+                            ),
                           );
                         }).toList(),
                       ),
@@ -82,9 +83,7 @@ class _PickupServicesState extends State<PickupServices> {
                             backgroundColor: primary,
                             child: Icon(Icons.keyboard_arrow_right),
                             onPressed: () {
-                              save();
-                              Navigator.pushReplacementNamed(
-                                  context, '/pickup-date');
+                              _next(context);
                             },
                           ),
                         ],
@@ -103,18 +102,18 @@ class _PickupServicesState extends State<PickupServices> {
   @override
   void initState() {
     super.initState();
-    read();
+    _init();
   }
 
-  save() {
+  _next(context) {
     Store store = Store();
     store.save('pickup-services', _services);
+    Navigator.pushReplacementNamed(context, '/pickup-date');
   }
 
-  read() async {
+  _init() async {
     Store store = Store();
     var data = await store.read('pickup-services');
-
     setState(() {
       _services['Inside pickup'] = data['Inside pickup'];
       _services['Tailgate'] = data['Tailgate'];

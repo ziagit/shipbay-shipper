@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shipbay/pages/shared/progress.dart';
 import 'package:shipbay/pages/store/store.dart';
 import 'package:shipbay/services/settings.dart';
@@ -29,11 +30,15 @@ class _PaymentDetailsState extends State<PaymentDetails> {
       body: ListView(
         children: [
           Padding(
-            padding: const EdgeInsets.all(30.0),
+            padding: const EdgeInsets.all(20.0),
             child: Column(
               children: [
                 SizedBox(child: Progress(progress: _progress)),
-                SizedBox(height: 30.0),
+                Text(
+                  "Payment details",
+                  style: TextStyle(fontSize: 22.0, height: 2.0),
+                ),
+                SizedBox(height: 16.0),
                 Container(
                   width: double.infinity,
                   padding: EdgeInsets.all(10.0),
@@ -84,7 +89,8 @@ class _PaymentDetailsState extends State<PaymentDetails> {
                                 borderRadius: BorderRadius.circular(30.0),
                               ),
                               onPressed: () {
-                                Navigator.pushNamed(context, '/confirm');
+                                Navigator.pushReplacementNamed(
+                                    context, '/confirm');
                               },
                             ),
                     ],
@@ -100,7 +106,7 @@ class _PaymentDetailsState extends State<PaymentDetails> {
 
   @override
   void initState() {
-    init();
+    _init();
     super.initState();
   }
 
@@ -124,12 +130,12 @@ class _PaymentDetailsState extends State<PaymentDetails> {
       ),
     ).then((Object value) {
       setState(() {
-        charge(value);
+        _charge(value);
       });
     });
   }
 
-  void init() async {
+  _init() async {
     var data = await store.read('billing');
     if (data != null) {
       setState(() {
@@ -137,19 +143,16 @@ class _PaymentDetailsState extends State<PaymentDetails> {
         _paymentStatus = data['status'];
         _paymentMessage = data['message'];
         _successColor = Colors.green;
-        print("kkkkkkkkkkkkkkkk");
       });
     }
-    print("...........billing.........");
-    print(data);
   }
 
-  Future<Map<String, dynamic>> charge(data) async {
+  Future<Map<String, dynamic>> _charge(data) async {
     print(data['token']);
     var carrier = await store.read('carrier');
     try {
       var response = await http.post(
-        'http://192.168.2.19:8000/api/charge',
+        'http://192.168.2.14:8000/api/charge',
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(<String, Object>{
           'price': carrier['price'],
@@ -163,20 +166,19 @@ class _PaymentDetailsState extends State<PaymentDetails> {
         }),
       );
       var jsonData = jsonDecode(response.body);
+
       store.save('billing', {
         'status': jsonData['status'],
         'email': jsonData['email'],
-        'message': jsonData['message']
+        'message': jsonData['message'],
+        'orderId': jsonData['id']
       });
-      store.save('orderId', jsonData['id']);
       setState(() {
         _progress = 100.0;
         _paymentMessage = jsonData['message'];
         _successColor = Colors.green;
         _paymentStatus = jsonData['status'];
       });
-      print("............................");
-      print(jsonData);
     } catch (err) {
       print('err charging user: ${err.toString()}');
     }
@@ -202,6 +204,7 @@ class _CheckoutState extends State<Checkout> {
   TextEditingController postalcodeController = new TextEditingController();
   String _stripeError;
   bool _isLoading = false;
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -216,148 +219,229 @@ class _CheckoutState extends State<Checkout> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Flexible(
-          child: TextField(
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: <Widget>[
+          Flexible(
+            child: TextFormField(
               autofocus: true,
               controller: emailController,
               decoration: InputDecoration(labelText: 'Email'),
-              style: TextStyle(fontSize: 14.0)),
-        ),
-        Flexible(
-          child: TextField(
+              style: TextStyle(fontSize: 14.0),
+              validator: (value) {
+                if (value.isEmpty) {
+                  return 'Please enter a valid email';
+                }
+                return null;
+              },
+            ),
+          ),
+          Flexible(
+            child: TextFormField(
               controller: addressController,
               decoration: InputDecoration(labelText: 'Address'),
-              style: TextStyle(fontSize: 14.0)),
-        ),
-        Row(
-          children: [
-            Flexible(
-              child: TextField(
+              style: TextStyle(fontSize: 14.0),
+              validator: (value) {
+                if (value.isEmpty) {
+                  return 'Please enter a valid address';
+                }
+                return null;
+              },
+            ),
+          ),
+          Row(
+            children: [
+              Flexible(
+                child: TextFormField(
                   controller: cityController,
                   decoration: InputDecoration(labelText: 'City'),
-                  style: TextStyle(fontSize: 14.0)),
-            ),
-            Flexible(
-              child: TextField(
+                  style: TextStyle(fontSize: 14.0),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter a valid city';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              Flexible(
+                child: TextFormField(
                   controller: stateController,
                   decoration: InputDecoration(labelText: 'State'),
-                  style: TextStyle(fontSize: 14.0)),
-            ),
-            Flexible(
-              child: TextField(
+                  style: TextStyle(fontSize: 14.0),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter a valid state';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              Flexible(
+                child: TextFormField(
                   controller: postalcodeController,
                   decoration: InputDecoration(labelText: 'Postalcode'),
-                  style: TextStyle(fontSize: 14.0)),
-            ),
-          ],
-        ),
-        Flexible(
-          child: TextField(
+                  style: TextStyle(fontSize: 14.0),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter a valid postalcode';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+            ],
+          ),
+          Flexible(
+            child: TextFormField(
               controller: nameOnCardController,
               decoration: InputDecoration(labelText: 'Name on card'),
-              style: TextStyle(fontSize: 14.0)),
-        ),
-        Flexible(
-          child: TextField(
-            controller: cardNumberController,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              labelText: 'Card number',
-              prefixIcon: Icon(Icons.credit_card),
+              style: TextStyle(fontSize: 14.0),
+              validator: (value) {
+                if (value.isEmpty) {
+                  return 'Please enter a valid name';
+                }
+                return null;
+              },
             ),
-            style: TextStyle(fontSize: 14.0),
           ),
-        ),
-        Row(
-          children: [
-            Flexible(
-              child: TextField(
-                controller: cvcController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'CVC'),
-                style: TextStyle(fontSize: 12.0),
+          Flexible(
+            child: TextFormField(
+              controller: cardNumberController,
+              keyboardType: TextInputType.number,
+              inputFormatters: [LengthLimitingTextInputFormatter(16)],
+              decoration: InputDecoration(
+                labelText: 'Card number',
+                prefixIcon: Icon(Icons.credit_card),
               ),
+              style: TextStyle(fontSize: 14.0),
+              validator: (value) {
+                if (value.isEmpty) {
+                  return 'Please enter a valid card number';
+                }
+                return null;
+              },
             ),
-            Flexible(
-              child: TextField(
-                controller: expMonthController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Exp month'),
-                style: TextStyle(fontSize: 12.0),
+          ),
+          Row(
+            children: [
+              Flexible(
+                child: TextFormField(
+                  controller: cvcController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [LengthLimitingTextInputFormatter(3)],
+                  decoration: InputDecoration(labelText: 'CVC'),
+                  style: TextStyle(fontSize: 12.0),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter a 3 digits number';
+                    }
+                    return null;
+                  },
+                ),
               ),
-            ),
-            Flexible(
-              child: TextField(
-                controller: expYearController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Exp year'),
-                style: TextStyle(fontSize: 12.0),
+              Flexible(
+                child: TextFormField(
+                  controller: expMonthController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [LengthLimitingTextInputFormatter(2)],
+                  decoration: InputDecoration(labelText: 'Exp month'),
+                  style: TextStyle(fontSize: 12.0),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter a valid 2 ditis month';
+                    }
+                    return null;
+                  },
+                ),
               ),
-            ),
-          ],
-        ),
-        Text(
-          (_stripeError == null) ? '' : _stripeError,
-          style: TextStyle(fontSize: 10.0, color: Colors.red),
-        ),
-        SizedBox(height: 40.0),
-        _isLoading
-            ? SizedBox(
-                height: 30.0,
-                width: 30.0,
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation(primary),
+              Flexible(
+                child: TextFormField(
+                  controller: expYearController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [LengthLimitingTextInputFormatter(2)],
+                  decoration: InputDecoration(labelText: 'Exp year'),
+                  style: TextStyle(fontSize: 12.0),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter a valid 2 digits year';
+                    }
+                    return null;
+                  },
                 ),
-              )
-            : RaisedButton(
-                child: Text(
-                  'Submit',
-                  style: TextStyle(fontSize: 12.0, color: Colors.white),
-                ),
-                color: primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18.0),
-                  side: BorderSide(color: Colors.red),
-                ),
-                onPressed: () {
-                  setState(() {
-                    _isLoading = true;
-                  });
-                  final CreditCard shippingCard = CreditCard(
-                    number: cardNumberController.text,
-                    expMonth: int.parse(expMonthController.text),
-                    expYear: int.parse(expYearController.text),
-                    cvc: cvcController.text,
-                  );
+              ),
+            ],
+          ),
+          Text(
+            (_stripeError == null) ? '' : _stripeError,
+            style: TextStyle(fontSize: 10.0, color: Colors.red),
+          ),
+          SizedBox(height: 40.0),
+          _isLoading
+              ? SizedBox(
+                  height: 30.0,
+                  width: 30.0,
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation(primary),
+                  ),
+                )
+              : RaisedButton(
+                  child: Text(
+                    'Submit',
+                    style: TextStyle(fontSize: 12.0, color: Colors.white),
+                  ),
+                  color: primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18.0),
+                    side: BorderSide(color: Colors.red),
+                  ),
+                  onPressed: () {
+                    if (_formKey.currentState.validate()) {
+                      setState(
+                        () {
+                          _isLoading = true;
+                        },
+                      );
+                      final CreditCard shippingCard = CreditCard(
+                        number: cardNumberController.text,
+                        expMonth: int.parse(expMonthController.text),
+                        expYear: int.parse(expYearController.text),
+                        cvc: cvcController.text,
+                      );
 
-                  StripePayment.createTokenWithCard(shippingCard).then((token) {
-                    setState(() {
-                      _stripeError = null;
-                      _isLoading = false;
-                    });
-                    final data = {
-                      'token': token.tokenId,
-                      'email': emailController.text,
-                      'address': addressController.text,
-                      'city': cityController.text,
-                      'state': stateController.text,
-                      'postalcode': postalcodeController.text,
-                      'name': nameOnCardController.text
-                    };
-                    Navigator.pop(context, data);
-                  }).catchError(
-                    (error) => {
-                      setState(() {
-                        _isLoading = false;
-                        _stripeError = error.message;
-                      }),
-                    },
-                  );
-                },
-              )
-      ],
+                      StripePayment.createTokenWithCard(shippingCard).then(
+                        (token) {
+                          setState(() {
+                            _stripeError = null;
+                            _isLoading = false;
+                          });
+                          final data = {
+                            'token': token.tokenId,
+                            'email': emailController.text,
+                            'address': addressController.text,
+                            'city': cityController.text,
+                            'state': stateController.text,
+                            'postalcode': postalcodeController.text,
+                            'name': nameOnCardController.text
+                          };
+                          Navigator.pop(context, data);
+                        },
+                      ).catchError(
+                        (error) => {
+                          setState(
+                            () {
+                              _isLoading = false;
+                              _stripeError = error.message;
+                            },
+                          ),
+                        },
+                      );
+                    }
+                  },
+                )
+        ],
+      ),
     );
   }
 }

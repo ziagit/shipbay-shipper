@@ -5,30 +5,39 @@ class Welcome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: bgColor,
-        elevation: 0.0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/additional-details');
-          },
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(30.0),
-        child: Column(
-          children: [
-            Text("in welcome page"),
-            RaisedButton(
-                child: Text("go to account"),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(30.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Welcome to Shipbay",
+                style: TextStyle(
+                    color: primary,
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.bold),
+              ),
+              Text(
+                "Please complete your registeration",
+                style: TextStyle(color: Colors.grey[800]),
+              ),
+              SizedBox(height: 24.0),
+              RaisedButton(
+                color: Colors.orange[900],
+                child: Text(
+                  "Continue",
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.w400),
+                ),
+                shape: RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(30.0)),
                 onPressed: () {
-                  Navigator.pushReplacementNamed(context, "/shipper");
-                })
-          ],
+                  Navigator.pushReplacementNamed(context, '/profile');
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

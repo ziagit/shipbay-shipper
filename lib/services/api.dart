@@ -71,7 +71,7 @@ class Login {
         'email': email,
         'password': password,
       };
-      var response = await http.post('http://192.168.2.36:8000/api/auth/signin',
+      var response = await http.post('http://192.168.2.14:8000/api/auth/signin',
           body: body,
           headers: {'Content-Type': 'application/x-www-form-urlencoded'});
       var data = jsonDecode(response.body);
@@ -103,7 +103,7 @@ class Register {
         'password_confirmation': password_confirmation,
         'role': role,
       };
-      var response = await http.post('http://192.168.2.36:8000/api/auth/signup',
+      var response = await http.post('http://192.168.2.14:8000/api/auth/signup',
           body: body,
           headers: {'Content-Type': 'application/x-www-form-urlencoded'});
       var data = jsonDecode(response.body);
@@ -126,7 +126,7 @@ class Logout {
     String _token = await store.read('token');
     try {
       var response = await http
-          .post('http://192.168.2.36:8000/api/auth/signout', headers: {
+          .post('http://192.168.2.14:8000/api/auth/signout', headers: {
         'Authorization': 'Bearer ${_token}',
         'Content-Type': 'application/x-www-form-urlencoded'
       });
@@ -146,10 +146,25 @@ class Details {
     String _token = await store.read('token');
     try {
       var response =
-          await http.get('http://192.168.2.36:8000/api/auth/me', headers: {
+          await http.get('http://192.168.2.14:8000/api/auth/me', headers: {
         'Authorization': 'Bearer ${_token}',
         'Content-Type': 'application/x-www-form-urlencoded'
       });
+      var data = jsonDecode(response.body);
+      return data;
+    } catch (err) {
+      print('err: ${err.toString()}');
+    }
+    return null;
+  }
+}
+
+class ItemType {
+  ItemType();
+  Future<Map<String, dynamic>> types() async {
+    try {
+      var response = await http.get('http://192.168.2.14:8000/api/item-type',
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'});
       var data = jsonDecode(response.body);
       return data;
     } catch (err) {

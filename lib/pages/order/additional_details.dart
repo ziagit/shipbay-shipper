@@ -9,6 +9,8 @@ class AdditionalDetails extends StatefulWidget {
 }
 
 class _AdditionalDetailsState extends State<AdditionalDetails> {
+  Store store = Store();
+  final _formKey = GlobalKey<FormState>();
   TextEditingController _estimatedCostController = TextEditingController();
   TextEditingController _instructionsController = TextEditingController();
   TextEditingController _pickupNameController = TextEditingController();
@@ -36,102 +38,152 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
       body: ListView(
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.all(30.0),
+            padding: const EdgeInsets.all(20.0),
             child: Column(
               children: <Widget>[
                 Container(child: Progress(progress: 73.0)),
                 Container(
-                  child: Column(
-                    children: <Widget>[
-                      Text(
-                        "Additional details",
-                        style: TextStyle(fontSize: 24.0, height: 2.0),
-                      ),
-                      SizedBox(height: 16.0),
-                      TextFormField(
-                        controller: _estimatedCostController,
-                        decoration: InputDecoration(
-                            hintText: 'Estimated shipment value'),
-                      ),
-                      TextFormField(
-                        controller: _instructionsController,
-                        decoration: InputDecoration(hintText: 'Instructions'),
-                      ),
-                      SizedBox(height: 24.0),
-                      Container(
-                        alignment: Alignment.centerLeft,
-                        child: Text("Contacts: ",
-                            style: TextStyle(fontSize: 16.0)),
-                      ),
-                      ExpansionTile(
-                        title: Text("Pickup"),
-                        children: <Widget>[
-                          TextFormField(
-                            controller: _pickupNameController,
-                            decoration: InputDecoration(
-                              labelText: 'Name',
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: <Widget>[
+                        Text(
+                          "Additional details",
+                          style: TextStyle(fontSize: 22.0, height: 2.0),
+                        ),
+                        SizedBox(height: 16.0),
+                        TextFormField(
+                          controller: _estimatedCostController,
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter a valid value';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                              labelText: 'Estimated shipment value'),
+                        ),
+                        TextFormField(
+                          controller: _instructionsController,
+                          decoration:
+                              InputDecoration(labelText: 'Instructions'),
+                        ),
+                        SizedBox(height: 24.0),
+                        Container(
+                          alignment: Alignment.centerLeft,
+                          child: Text("Contacts: ",
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                        ExpansionTile(
+                          title: Text("Pickup"),
+                          children: <Widget>[
+                            TextFormField(
+                              controller: _pickupNameController,
+                              style: TextStyle(fontSize: 12.0),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Please enter a valid name';
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Name',
+                              ),
                             ),
-                            style: TextStyle(fontSize: 12.0),
-                          ),
-                          TextFormField(
-                            controller: _pickupPhoneController,
-                            decoration: InputDecoration(labelText: 'Phone'),
-                            style: TextStyle(fontSize: 12.0),
-                          ),
-                          TextFormField(
-                            controller: _pickupEmailController,
-                            decoration: InputDecoration(labelText: 'Email'),
-                            style: TextStyle(fontSize: 12.0),
-                          ),
-                        ],
-                      ),
-                      ExpansionTile(
-                        title: Text("Delivery"),
-                        children: <Widget>[
-                          TextFormField(
-                            controller: _deliveryNameController,
-                            decoration: InputDecoration(labelText: 'Name'),
-                            style: TextStyle(fontSize: 12.0),
-                          ),
-                          TextFormField(
-                            controller: _deliveryPhoneController,
-                            decoration: InputDecoration(labelText: 'Phone'),
-                            style: TextStyle(fontSize: 12.0),
-                          ),
-                          TextFormField(
-                            controller: _deliveryEmailController,
-                            decoration: InputDecoration(labelText: 'Email'),
-                            style: TextStyle(fontSize: 12.0),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 24.0),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          FloatingActionButton(
-                            heroTag: 0,
-                            backgroundColor: Colors.orange[50],
-                            foregroundColor: Colors.orange[900],
-                            child: Icon(Icons.keyboard_arrow_left),
-                            onPressed: () {
-                              Navigator.pushReplacementNamed(context, '/items');
-                            },
-                          ),
-                          SizedBox(width: 16.0),
-                          FloatingActionButton(
-                            heroTag: 1,
-                            backgroundColor: Colors.orange[900],
-                            child: Icon(Icons.keyboard_arrow_right),
-                            onPressed: () {
-                              save();
-                              Navigator.pushReplacementNamed(
-                                  context, '/carriers');
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
+                            TextFormField(
+                              controller: _pickupPhoneController,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(labelText: 'Phone'),
+                              style: TextStyle(fontSize: 12.0),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Please enter a valid phone number';
+                                }
+                                return null;
+                              },
+                            ),
+                            TextFormField(
+                              controller: _pickupEmailController,
+                              decoration: InputDecoration(labelText: 'Email'),
+                              style: TextStyle(fontSize: 12.0),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Please enter a valid email';
+                                }
+                                return null;
+                              },
+                            ),
+                          ],
+                        ),
+                        ExpansionTile(
+                          title: Text("Delivery"),
+                          children: <Widget>[
+                            TextFormField(
+                              controller: _deliveryNameController,
+                              decoration: InputDecoration(labelText: 'Name'),
+                              style: TextStyle(fontSize: 12.0),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Please enter a valid name';
+                                }
+                                return null;
+                              },
+                            ),
+                            TextFormField(
+                              controller: _deliveryPhoneController,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(labelText: 'Phone'),
+                              style: TextStyle(fontSize: 12.0),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Please enter a valid phone number';
+                                }
+                                return null;
+                              },
+                            ),
+                            TextFormField(
+                              controller: _deliveryEmailController,
+                              decoration: InputDecoration(labelText: 'Email'),
+                              style: TextStyle(fontSize: 12.0),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Please enter a valid email';
+                                }
+                                return null;
+                              },
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 24.0),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            FloatingActionButton(
+                              heroTag: 0,
+                              backgroundColor: Colors.orange[50],
+                              foregroundColor: Colors.orange[900],
+                              child: Icon(Icons.keyboard_arrow_left),
+                              onPressed: () {
+                                Navigator.pushReplacementNamed(
+                                    context, '/items');
+                              },
+                            ),
+                            SizedBox(width: 16.0),
+                            FloatingActionButton(
+                              heroTag: 1,
+                              backgroundColor: Colors.orange[900],
+                              child: Icon(Icons.keyboard_arrow_right),
+                              onPressed: () {
+                                if (_formKey.currentState.validate()) {
+                                  _next(context);
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -144,27 +196,27 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
 
   @override
   void initState() {
-    read();
+    _init();
     super.initState();
   }
 
-  read() async {
-    Store store = Store();
+  _init() async {
     var data = await store.read('additional-details');
     setState(() {
-      _estimatedCostController.text = data['estimated_cost'].toString();
-      _instructionsController.text = data['instructions'];
-      _pickupNameController.text = data['pickup_name'];
-      _pickupPhoneController.text = data['pickup_phone'].toString();
-      _pickupEmailController.text = data['pickup_email'];
-      _deliveryNameController.text = data['delivery_name'];
-      _deliveryPhoneController.text = data['delivery_phone'].toString();
-      _deliveryEmailController.text = data['delivery_email'];
+      if (data != null) {
+        _estimatedCostController.text = data['estimated_cost'].toString();
+        _instructionsController.text = data['instructions'];
+        _pickupNameController.text = data['pickup_name'];
+        _pickupPhoneController.text = data['pickup_phone'].toString();
+        _pickupEmailController.text = data['pickup_email'];
+        _deliveryNameController.text = data['delivery_name'];
+        _deliveryPhoneController.text = data['delivery_phone'].toString();
+        _deliveryEmailController.text = data['delivery_email'];
+      }
     });
   }
 
-  save() {
-    Store store = Store();
+  _next(context) {
     AdditionalDetailsModel additionalDetailsModel = AdditionalDetailsModel();
     additionalDetailsModel.estimated_cost =
         double.parse(_estimatedCostController.text);
@@ -178,5 +230,6 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
         int.parse(_deliveryPhoneController.text);
     additionalDetailsModel.delivery_email = _deliveryEmailController.text;
     store.save('additional-details', additionalDetailsModel);
+    Navigator.pushReplacementNamed(context, '/carriers');
   }
 }

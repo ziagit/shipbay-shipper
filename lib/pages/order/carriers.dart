@@ -45,20 +45,23 @@ class _CarriersState extends State<Carriers> {
       body: ListView(
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.all(30.0),
+            padding: const EdgeInsets.all(20.0),
             child: Column(
               children: <Widget>[
                 Container(child: Progress(progress: 85.0)),
-                SizedBox(height: 24.0),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Row(children: <Widget>[
-                      Text("$_src_city"),
-                      Icon(Icons.arrow_right),
-                      Text("$_des_city")
-                    ]),
-                  ),
+                Text(
+                  "Select a carrier",
+                  style: TextStyle(fontSize: 22.0, height: 2.0),
+                ),
+                SizedBox(height: 16.0),
+                Container(
+                  decoration: _customStyle(context),
+                  padding: const EdgeInsets.all(24.0),
+                  child: Row(children: <Widget>[
+                    Text("$_src_city"),
+                    Icon(Icons.arrow_right),
+                    Text("$_des_city")
+                  ]),
                 ),
                 SizedBox(height: 16.0),
                 FutureBuilder(
@@ -66,13 +69,10 @@ class _CarriersState extends State<Carriers> {
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
                     if (snapshot.data == null) {
                       return Container(
-                        child: Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Center(
-                              child: Text("Loading..."),
-                            ),
-                          ),
+                        decoration: _customStyle(context),
+                        padding: const EdgeInsets.all(8.0),
+                        child: Center(
+                          child: Text("Loading..."),
                         ),
                       );
                     } else {
@@ -81,93 +81,88 @@ class _CarriersState extends State<Carriers> {
                         itemCount: snapshot.data.length,
                         itemBuilder: (BuildContext context, int index) {
                           return ListTile(
+                            dense: true,
+                            contentPadding:
+                                EdgeInsets.only(left: 0.0, right: 0.0),
                             title: Container(
-                              child: Card(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                              decoration: _customStyle(context),
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      CircleAvatar(
+                                        backgroundColor: Colors.grey[200],
+                                        backgroundImage: AssetImage(
+                                            'assets/images/coffeequery.png'),
+                                      ),
+                                      SizedBox(width: 5.0),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            snapshot.data[index].company,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          SizedBox(
+                                            width: 150.0,
+                                            child: Text(
+                                              "Read more about this carrier",
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(fontSize: 12.0),
+                                            ),
+                                          ),
+                                          SizedBox(height: 16.0),
+                                          SmoothStarRating(
+                                              starCount: 5,
+                                              rating:
+                                                  snapshot.data[index].rates +
+                                                      .0,
+                                              size: 16.0,
+                                              isReadOnly: true,
+                                              color: Colors.orange,
+                                              borderColor: Colors.orange,
+                                              spacing: 0.0)
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
                                     children: [
                                       Row(
                                         children: [
-                                          CircleAvatar(
-                                            backgroundColor: Colors.grey[200],
-                                            backgroundImage: AssetImage(
-                                                'assets/images/coffeequery.png'),
+                                          IconButton(
+                                            icon: Icon(Icons.info,
+                                                color: Colors.blue),
+                                            onPressed: () {},
                                           ),
-                                          SizedBox(width: 5.0),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                snapshot.data[index].company,
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              SizedBox(
-                                                width: 150.0,
-                                                child: Text(
-                                                  "Read more about this carrier",
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style:
-                                                      TextStyle(fontSize: 12.0),
-                                                ),
-                                              ),
-                                              SizedBox(height: 16.0),
-                                              SmoothStarRating(
-                                                  starCount: 5,
-                                                  rating: snapshot
-                                                          .data[index].rates +
-                                                      .0,
-                                                  size: 16.0,
-                                                  isReadOnly: true,
-                                                  color: Colors.orange,
-                                                  borderColor: Colors.orange,
-                                                  spacing: 0.0)
-                                            ],
-                                          ),
+                                          Text(
+                                              "\$${snapshot.data[index].price.toStringAsFixed(2)}",
+                                              style: TextStyle(fontSize: 12.0))
                                         ],
                                       ),
-                                      Column(
-                                        children: [
-                                          Row(
-                                            children: [
-                                              IconButton(
-                                                icon: Icon(Icons.info,
-                                                    color: Colors.blue),
-                                                onPressed: () {},
-                                              ),
-                                              Text(
-                                                  "\$${snapshot.data[index].price.toStringAsFixed(2)}",
-                                                  style:
-                                                      TextStyle(fontSize: 12.0))
-                                            ],
-                                          ),
-                                          OutlineButton(
-                                            borderSide: BorderSide(
-                                                color: primary, width: 0.5),
-                                            child: Text(
-                                              "Select",
-                                              style: TextStyle(fontSize: 12.0),
-                                            ),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(30.0),
-                                            ),
-                                            onPressed: () {
-                                              _next(context,
-                                                  snapshot.data[index]);
-                                            },
-                                          ),
-                                        ],
-                                      )
+                                      OutlineButton(
+                                        borderSide: BorderSide(
+                                            color: primary, width: 0.5),
+                                        child: Text(
+                                          "Select",
+                                          style: TextStyle(fontSize: 12.0),
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30.0),
+                                        ),
+                                        onPressed: () {
+                                          _next(context, snapshot.data[index]);
+                                        },
+                                      ),
                                     ],
-                                  ),
-                                ),
+                                  )
+                                ],
                               ),
                             ),
                           );
@@ -186,23 +181,26 @@ class _CarriersState extends State<Carriers> {
 
   @override
   void initState() {
-    read();
-    initOrder();
+    _init();
     super.initState();
   }
 
-  read() async {
-    var pickup = await store.read('pickup');
-    var delivery = await store.read('delivery');
-    if (pickup != null && delivery != null) {
-      setState(() {
-        _src_city = pickup['city'];
-        _des_city = delivery['city'];
-      });
-    }
+  Decoration _customStyle(context) {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(10.0),
+      boxShadow: [
+        new BoxShadow(
+          color: Colors.grey.shade200,
+          offset: new Offset(0.0, 10.0),
+          blurRadius: 10.0,
+          spreadRadius: 1.0,
+        )
+      ],
+    );
   }
 
-  initOrder() async {
+  _init() async {
     var pickup = await store.read('pickup');
     var delivery = await store.read('delivery');
     var items = await store.read('items');
@@ -212,6 +210,14 @@ class _CarriersState extends State<Carriers> {
     var deliveryAppointmentTime = await store.read('delivery-appointment-time');
     var itemConditions = await store.read('item-condition');
     var itemTemperature = await store.read('temperature');
+
+    if (pickup != null && delivery != null) {
+      setState(() {
+        _src_city = pickup['city'];
+        _des_city = delivery['city'];
+      });
+    }
+
     order['src'] = pickup;
     order['src']['accessories'] = [];
     order['src']['accessories'].add(pickup['location_type']);
@@ -223,10 +229,8 @@ class _CarriersState extends State<Carriers> {
       order['src']['accessories'].add('tl');
     }
     order['src']['accessories'].add(delivery['location_type']);
-    if (pickupDate['is_appointment'] == true) {
-      order['src']['accessories'].add(delivery['ap']);
-      order['src']['appointmentTime'] = pickupDate['time'];
-    }
+    order['src']['accessories'].add(delivery['ap']);
+    order['src']['appointmentTime'] = pickupDate['time'];
     order['pickDate'] = pickupDate['date'];
 
     order['des'] = delivery;
@@ -240,9 +244,7 @@ class _CarriersState extends State<Carriers> {
     if (deliveryServices['Appointment'] == true) {
       order['des']['accessories'].add('ap');
     }
-    if (deliveryAppointmentTime != null) {
-      order['des']['appointmentTime'] = deliveryAppointmentTime;
-    }
+    order['des']['appointmentTime'] = deliveryAppointmentTime;
     order['myItem'] = {};
     order['myItem']['items'] = items;
     order['myItem']['conditions'] = [];
@@ -254,42 +256,48 @@ class _CarriersState extends State<Carriers> {
     }
     if (itemConditions['Temperature sensitive']) {
       order['myItem']['conditions'].add('tm');
-      order['myItem']['maxTemp'] = itemTemperature['max_temp'].toString();
-      order['myItem']['minTemp'] = itemTemperature['min_temp'].toString();
     }
+    order['myItem']['maxTemp'] = itemTemperature['max_temp'].toString();
+    order['myItem']['minTemp'] = itemTemperature['min_temp'].toString();
   }
 
   Future<List<Carrier>> _getCarriers() async {
-    Response response = await post(
-      "http://192.168.2.19:8000/api/carriers-rate",
-      headers: <String, String>{
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode(<String, Object>{
-        "src": order['src'],
-        "pickDate": order['pickDate'],
-        "des": order['des'],
-        "myItem": order['myItem'],
-      }),
-    );
+    print("getting carrier...");
+    try {
+      Response response = await post(
+        "http://192.168.2.14:8000/api/carriers-rate",
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(<String, Object>{
+          "src": order['src'],
+          "pickDate": order['pickDate'],
+          "des": order['des'],
+          "myItem": order['myItem'],
+        }),
+      );
 
-    var jsonData = jsonDecode(response.body);
-    List<Carrier> carriers = [];
-    for (int i = 0; i < jsonData.length; i++) {
-      Carrier carrier = Carrier(
-          i + 1,
-          jsonData[i]['first_name'],
-          jsonData[i]['last_name'],
-          jsonData[i]['phone'],
-          jsonData[i]['price'],
-          jsonData[i]['company'],
-          jsonData[i]['detail'],
-          jsonData[i]['rates'],
-          jsonData[i]['website'],
-          jsonData[i]['logo']);
-      carriers.add(carrier);
+      var jsonData = jsonDecode(response.body);
+      List<Carrier> carriers = [];
+      for (int i = 0; i < jsonData.length; i++) {
+        Carrier carrier = Carrier(
+            jsonData[i]['id'],
+            jsonData[i]['first_name'],
+            jsonData[i]['last_name'],
+            jsonData[i]['phone'],
+            jsonData[i]['price'].toDouble(),
+            jsonData[i]['company'],
+            jsonData[i]['detail'],
+            jsonData[i]['rates'].toDouble(),
+            jsonData[i]['website'],
+            jsonData[i]['logo']);
+
+        carriers.add(carrier);
+      }
+      return carriers;
+    } catch (err) {
+      print("error: ${err.toString()}");
     }
-    return carriers;
   }
 
   _next(context, carrier) async {

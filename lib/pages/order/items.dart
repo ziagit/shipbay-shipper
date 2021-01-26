@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shipbay/models/item_model.dart';
 import 'package:shipbay/models/temperature.dart';
 import 'package:shipbay/pages/shared/progress.dart';
@@ -23,10 +24,11 @@ class _ItemsState extends State<Items> {
 
   bool _isTemperature = false;
   Store store = Store();
-
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         backgroundColor: bgColor,
         elevation: 0.0,
@@ -43,7 +45,7 @@ class _ItemsState extends State<Items> {
       body: ListView(
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.all(30.0),
+            padding: const EdgeInsets.all(20.0),
             child: Column(
               children: <Widget>[
                 SizedBox(child: Progress(progress: 61.0)),
@@ -52,11 +54,11 @@ class _ItemsState extends State<Items> {
                     children: <Widget>[
                       Text(
                         "Items to be delivered",
-                        style: TextStyle(fontSize: 24.0, height: 2.0),
+                        style: TextStyle(fontSize: 22.0, height: 2.0),
                       ),
                       SizedBox(height: 16.0),
                       Visibility(
-                        visible: true,
+                        visible: _items.isNotEmpty,
                         child: Column(
                           children: [
                             Container(
@@ -73,7 +75,7 @@ class _ItemsState extends State<Items> {
                                       spreadRadius: 1.0,
                                     )
                                   ]),
-                              height: 150.0,
+                              height: 100.0,
                               child: ListView.builder(
                                 itemCount: _items.length,
                                 itemBuilder: (context, index) {
@@ -95,7 +97,7 @@ class _ItemsState extends State<Items> {
                                         icon: Icon(Icons.remove_circle_outline,
                                             color: Colors.red),
                                         onPressed: () {
-                                          remove(index);
+                                          _remove(index);
                                         },
                                       ),
                                     ],
@@ -121,6 +123,7 @@ class _ItemsState extends State<Items> {
                         shrinkWrap: true,
                         children: _services.keys.map((String key) {
                           return new CheckboxListTile(
+                            controlAffinity: ListTileControlAffinity.leading,
                             activeColor: primary,
                             title: new Text(
                               key,
@@ -181,9 +184,7 @@ class _ItemsState extends State<Items> {
                             backgroundColor: Colors.orange[900],
                             child: Icon(Icons.keyboard_arrow_right),
                             onPressed: () {
-                              save();
-                              Navigator.pushReplacementNamed(
-                                  context, '/additional-details');
+                              _next(context);
                             },
                           ),
                         ],
@@ -201,7 +202,7 @@ class _ItemsState extends State<Items> {
 
   @override
   void initState() {
-    read();
+    _init();
     super.initState();
   }
 
@@ -227,38 +228,38 @@ class _ItemsState extends State<Items> {
     });
   }
 
-  remove(index) {
+  _remove(index) {
     setState(() {
       _items.removeAt(index);
     });
   }
 
-  read() async {
+  _init() async {
     var _savedItem = await store.read('items');
-    setState(() {
-      for (int i = 0; i < _savedItem.length; i++) {
-        ItemModel _item = ItemModel();
-        _item.description = _savedItem[i]['description'];
-        _item.type = _savedItem[i]['type'];
-        _item.length = _savedItem[i]['length'];
-        _item.width = _savedItem[i]['width'];
-        _item.height = _savedItem[i]['height'];
-        _item.weight = _savedItem[i]['weight'];
-        _item.number = _savedItem[i]['number'];
-        _items.add(_item);
-      }
-    });
-
     var savedConditions = await store.read('item-condition');
-    if (savedConditions != null) {
-      setState(() {
+    setState(() {
+      if (_savedItem != null) {
+        for (int i = 0; i < _savedItem.length; i++) {
+          ItemModel _item = ItemModel();
+          _item.description = _savedItem[i]['description'];
+          _item.type = _savedItem[i]['type'];
+          _item.length = _savedItem[i]['length'];
+          _item.width = _savedItem[i]['width'];
+          _item.height = _savedItem[i]['height'];
+          _item.weight = _savedItem[i]['weight'];
+          _item.number = _savedItem[i]['number'];
+          _items.add(_item);
+        }
+      }
+      if (savedConditions != null) {
         _services['Stackable'] = savedConditions['Stackable'];
         _services['Dangerous'] = savedConditions['Dangerous'];
         _services['Temperature sensitive'] =
             savedConditions['Temperature sensitive'];
         _isTemperature = savedConditions['Temperature sensitive'];
-      });
-    }
+      }
+    });
+
     if (_isTemperature) {
       var temp = await store.read('temperature');
 
@@ -267,17 +268,25 @@ class _ItemsState extends State<Items> {
     }
   }
 
-  save() {
-    store.save('items', _items);
-    store.save('item-condition', _services);
-
-    if (_isTemperature) {
-      Temperature temperature = Temperature();
-      temperature.min_temp = double.parse(_minTempController.text);
-      temperature.max_temp = double.parse(_maxTempController.text);
-      store.save('temperature', temperature);
+  _next(context) {
+    if (_items.isEmpty) {
+      _scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: Text('Please add your item!'),
+      ));
     } else {
-      store.remove('temperature');
+      print(_items);
+      store.save('items', _items);
+      store.save('item-condition', _services);
+
+      if (_isTemperature) {
+        Temperature temperature = Temperature();
+        temperature.min_temp = double.parse(_minTempController.text);
+        temperature.max_temp = double.parse(_maxTempController.text);
+        store.save('temperature', temperature);
+      } else {
+        store.remove('temperature');
+      }
+      Navigator.pushReplacementNamed(context, '/additional-details');
     }
   }
 }
@@ -294,97 +303,162 @@ class _AddItemState extends State<AddItem> {
   TextEditingController _heightController = TextEditingController();
   TextEditingController _weightController = TextEditingController();
   TextEditingController _numberController = TextEditingController();
+  TextEditingController _typeController = TextEditingController();
   String dropdownValue = 'Pallets';
+  var _types;
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(height: 16.0),
-        TextFormField(
-          controller: _descriptionController,
-          decoration: InputDecoration(labelText: 'Item description'),
-        ),
-        DropdownButtonFormField<String>(
-          value: dropdownValue,
-          icon: Icon(Icons.keyboard_arrow_down),
-          iconSize: 24,
-          elevation: 16,
-          style: TextStyle(color: Colors.black),
-          onChanged: (String newValue) {
-            setState(() {
-              dropdownValue = newValue;
-            });
-          },
-          items: <String>['Pallets', 'Pieces', 'Bundles', 'Box', 'Crate']
-              .map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value),
-            );
-          }).toList(),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Flexible(
-              child: TextFormField(
-                controller: _lengthController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Length'),
-                style: TextStyle(fontSize: 12.0),
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          SizedBox(height: 16.0),
+          TextFormField(
+            controller: _descriptionController,
+            decoration: InputDecoration(labelText: 'Item description'),
+            validator: (value) {
+              if (value.isEmpty) {
+                return 'Please enter a valid description';
+              }
+              return null;
+            },
+          ),
+          DropdownButtonFormField<String>(
+            value: dropdownValue,
+            icon: Icon(Icons.keyboard_arrow_down),
+            iconSize: 24,
+            elevation: 16,
+            style: TextStyle(color: Colors.black),
+            onChanged: (String newValue) {
+              setState(() {
+                dropdownValue = newValue;
+              });
+            },
+            items: <String>['Pallets', 'Pieces', 'Bundles', 'Box', 'Crate']
+                .map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Flexible(
+                child: TextFormField(
+                  controller: _lengthController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(labelText: 'Length'),
+                  style: TextStyle(fontSize: 12.0),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Enter > 0';
+                    }
+                    return null;
+                  },
+                ),
               ),
-            ),
-            Flexible(
-              child: TextFormField(
-                controller: _widthController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Width'),
-                style: TextStyle(fontSize: 12.0),
+              Flexible(
+                child: TextFormField(
+                  controller: _widthController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(labelText: 'Width'),
+                  style: TextStyle(fontSize: 12.0),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Enter > 0';
+                    }
+                    return null;
+                  },
+                ),
               ),
-            ),
-            Flexible(
-              child: TextFormField(
-                controller: _heightController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Height'),
-                style: TextStyle(fontSize: 12.0),
+              Flexible(
+                child: TextFormField(
+                  controller: _heightController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(labelText: 'Height'),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Enter > 0';
+                    }
+                    return null;
+                  },
+                  style: TextStyle(fontSize: 12.0),
+                ),
+              )
+            ],
+          ),
+          Row(
+            children: <Widget>[
+              Flexible(
+                child: TextFormField(
+                  controller: _weightController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(hintText: 'Weight'),
+                  style: TextStyle(fontSize: 12.0),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Enter > 0';
+                    }
+                    return null;
+                  },
+                ),
               ),
-            )
-          ],
-        ),
-        Row(
-          children: <Widget>[
-            Flexible(
-              child: TextFormField(
-                controller: _weightController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(hintText: 'Weight'),
-                style: TextStyle(fontSize: 12.0),
+              Flexible(
+                child: TextFormField(
+                  controller: _numberController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(hintText: 'Number of items'),
+                  style: TextStyle(fontSize: 12.0),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Enter > 0';
+                    }
+                    return null;
+                  },
+                ),
               ),
-            ),
-            Flexible(
-              child: TextFormField(
-                controller: _numberController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(hintText: 'Number of items'),
-                style: TextStyle(fontSize: 12.0),
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 20.0),
-        IconButton(
-            icon: Icon(Icons.add_circle_outline),
-            onPressed: () {
-              add(context);
-            })
-      ],
+            ],
+          ),
+          SizedBox(height: 20.0),
+          IconButton(
+              icon: Icon(Icons.add_circle_outline),
+              onPressed: () {
+                if (_formKey.currentState.validate()) {
+                  _add(context);
+                }
+              })
+        ],
+      ),
     );
   }
 
-  add(context) {
+  @override
+  void initState() {
+    //_getTypes();
+    _numberController.text = 1.toString();
+    super.initState();
+  }
+
+/*   Future<Map<String, dynamic>> _getTypes() async {
+    try {
+      var response = await http.get('http://192.168.2.14:8000/api/item-type',
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'});
+      _types = jsonDecode(response.body);
+      print("................");
+      print(_types);
+    } catch (err) {
+      print('err: ${err.toString()}');
+    }
+    return null;
+  } */
+
+  _add(context) {
     ItemModel _itemModel = ItemModel();
+    _itemModel.type = 1;
     _itemModel.description = _descriptionController.text;
     _itemModel.length = double.parse(_lengthController.text);
     _itemModel.width = double.parse(_widthController.text);

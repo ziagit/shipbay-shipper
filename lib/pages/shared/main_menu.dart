@@ -73,16 +73,6 @@ class _MainMenuState extends State<MainMenu> {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.person),
-                  title: Text(
-                    "Profile",
-                    style: TextStyle(fontSize: 14.0),
-                  ),
-                  onTap: () {
-                    _profile(context);
-                  },
-                ),
-                ListTile(
                   leading: Icon(Icons.arrow_back),
                   title: Text(
                     "Logout",
@@ -90,6 +80,47 @@ class _MainMenuState extends State<MainMenu> {
                   ),
                   onTap: () {
                     _logout(context);
+                  },
+                ),
+                Divider(),
+                ListTile(
+                  leading: Icon(Icons.person),
+                  title: Text(
+                    "Acount",
+                    style: TextStyle(fontSize: 14.0),
+                  ),
+                  onTap: () {
+                    Navigator.pushReplacementNamed(context, '/acount');
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.details),
+                  title: Text(
+                    "Profile",
+                    style: TextStyle(fontSize: 14.0),
+                  ),
+                  onTap: () {
+                    Navigator.pushReplacementNamed(context, '/profile');
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.add_box),
+                  title: Text(
+                    "Orders",
+                    style: TextStyle(fontSize: 14.0),
+                  ),
+                  onTap: () {
+                    Navigator.pushReplacementNamed(context, '/orders');
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.credit_card),
+                  title: Text(
+                    "Card",
+                    style: TextStyle(fontSize: 14.0),
+                  ),
+                  onTap: () {
+                    Navigator.pushReplacementNamed(context, '/card');
                   },
                 ),
               ],
@@ -117,16 +148,6 @@ class _MainMenuState extends State<MainMenu> {
   void initState() {
     _getDetails();
     super.initState();
-  }
-
-  Future<String> _profile(context) async {
-    String _token = await store.read('token');
-    if (_token != null) {
-      Navigator.of(context).pop();
-      Navigator.of(context).pushNamed('/shipper');
-    } else {
-      Navigator.of(context).pushNamed('/signin');
-    }
   }
 
   Future<Map<String, dynamic>> _logout(context) async {

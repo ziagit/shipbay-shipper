@@ -24,6 +24,7 @@ class _DeliveryState extends State<Delivery> {
   String street;
   String street_number;
   String formatted_address;
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -44,109 +45,114 @@ class _DeliveryState extends State<Delivery> {
       body: ListView(
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.all(30.0),
+            padding: const EdgeInsets.all(20.0),
             child: Column(
               children: <Widget>[
                 Container(child: Progress(progress: 37.0)),
                 Container(
-                  child: Column(
-                    children: <Widget>[
-                      Text(
-                        "Delivery address",
-                        style: TextStyle(fontSize: 24.0, height: 2.0),
-                      ),
-                      SizedBox(height: 16.0),
-                      TextFormField(
-                        controller: _addressController,
-                        decoration: InputDecoration(hintText: 'Postal code'),
-                        onChanged: (keyword) {
-                          _openDialog(context, keyword);
-                        },
-                      ),
-                      SizedBox(height: 16.0),
-                      Row(
-                        children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              Radio(
-                                  activeColor: primary,
-                                  value: "bs",
-                                  groupValue: groupValue,
-                                  onChanged: (val) {
-                                    setState(() {
-                                      groupValue = val;
-                                    });
-                                  }),
-                              Text(
-                                "Business",
-                                style: TextStyle(fontSize: 11.0),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: <Widget>[
-                              Radio(
-                                  activeColor: primary,
-                                  value: "rs",
-                                  groupValue: groupValue,
-                                  onChanged: (val) {
-                                    setState(() {
-                                      groupValue = val;
-                                    });
-                                  }),
-                              Text(
-                                "Residential",
-                                style: TextStyle(fontSize: 11.0),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: <Widget>[
-                              Radio(
-                                  activeColor: primary,
-                                  value: "sp",
-                                  groupValue: groupValue,
-                                  onChanged: (val) {
-                                    setState(() {
-                                      groupValue = val;
-                                    });
-                                  }),
-                              Text(
-                                "Special location",
-                                style: TextStyle(fontSize: 11.0),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 24.0),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          FloatingActionButton(
-                            heroTag: 0,
-                            backgroundColor: Colors.orange[50],
-                            foregroundColor: Colors.orange[900],
-                            child: Icon(Icons.keyboard_arrow_left),
-                            onPressed: () {
-                              Navigator.pushReplacementNamed(
-                                  context, '/pickup-date');
-                            },
-                          ),
-                          SizedBox(width: 16.0),
-                          FloatingActionButton(
-                            heroTag: 1,
-                            backgroundColor: Colors.orange[900],
-                            child: Icon(Icons.keyboard_arrow_right),
-                            onPressed: () {
-                              save();
-                              Navigator.pushReplacementNamed(
-                                  context, '/delivery-services');
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: <Widget>[
+                        Text(
+                          "Delivery address",
+                          style: TextStyle(fontSize: 22.0, height: 2.0),
+                        ),
+                        SizedBox(height: 16.0),
+                        TextFormField(
+                          controller: _addressController,
+                          decoration: InputDecoration(hintText: 'Postal code'),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter a valid address';
+                            }
+                            return null;
+                          },
+                          onChanged: (keyword) {
+                            _openDialog(context, keyword);
+                          },
+                        ),
+                        SizedBox(height: 16.0),
+                        Row(
+                          children: <Widget>[
+                            Radio(
+                                activeColor: primary,
+                                value: "bs",
+                                groupValue: groupValue,
+                                onChanged: (val) {
+                                  setState(() {
+                                    groupValue = val;
+                                  });
+                                }),
+                            Text(
+                              "Business",
+                              style: TextStyle(fontSize: 11.0),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: <Widget>[
+                            Radio(
+                                activeColor: primary,
+                                value: "rs",
+                                groupValue: groupValue,
+                                onChanged: (val) {
+                                  setState(() {
+                                    groupValue = val;
+                                  });
+                                }),
+                            Text(
+                              "Residential",
+                              style: TextStyle(fontSize: 11.0),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: <Widget>[
+                            Radio(
+                                activeColor: primary,
+                                value: "sp",
+                                groupValue: groupValue,
+                                onChanged: (val) {
+                                  setState(() {
+                                    groupValue = val;
+                                  });
+                                }),
+                            Text(
+                              "Special location",
+                              style: TextStyle(fontSize: 11.0),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 24.0),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            FloatingActionButton(
+                              heroTag: 0,
+                              backgroundColor: Colors.orange[50],
+                              foregroundColor: Colors.orange[900],
+                              child: Icon(Icons.keyboard_arrow_left),
+                              onPressed: () {
+                                Navigator.pushReplacementNamed(
+                                    context, '/pickup-date');
+                              },
+                            ),
+                            SizedBox(width: 16.0),
+                            FloatingActionButton(
+                              heroTag: 1,
+                              backgroundColor: Colors.orange[900],
+                              child: Icon(Icons.keyboard_arrow_right),
+                              onPressed: () {
+                                if (_formKey.currentState.validate()) {
+                                  _next(context);
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -160,7 +166,7 @@ class _DeliveryState extends State<Delivery> {
   @override
   void initState() {
     super.initState();
-    read();
+    _init();
   }
 
   _openDialog(context, keyword) {
@@ -186,7 +192,7 @@ class _DeliveryState extends State<Delivery> {
     );
   }
 
-  save() async {
+  _next(context) async {
     DeliveryAddressModel deliveryAddressModel = DeliveryAddressModel();
     Store store = Store();
     deliveryAddressModel.country = country;
@@ -198,12 +204,12 @@ class _DeliveryState extends State<Delivery> {
     deliveryAddressModel.formatted_address = formatted_address;
     deliveryAddressModel.location_type = groupValue;
     await store.save('delivery', deliveryAddressModel);
+    Navigator.pushReplacementNamed(context, '/delivery-services');
   }
 
-  read() async {
+  _init() async {
     Store store = Store();
     var data = await store.read('delivery');
-
     if (data != null) {
       setState(() {
         country = data['country'];

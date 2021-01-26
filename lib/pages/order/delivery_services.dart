@@ -38,7 +38,7 @@ class _DeliveryServicesState extends State<DeliveryServices> {
       body: ListView(
         children: [
           Padding(
-            padding: const EdgeInsets.all(30.0),
+            padding: const EdgeInsets.all(20.0),
             child: Column(
               children: <Widget>[
                 Container(child: Progress(progress: 50.0)),
@@ -47,13 +47,14 @@ class _DeliveryServicesState extends State<DeliveryServices> {
                     children: <Widget>[
                       Text(
                         "Delivery services",
-                        style: TextStyle(fontSize: 24.0, height: 2.0),
+                        style: TextStyle(fontSize: 22.0, height: 2.0),
                       ),
                       SizedBox(height: 16.0),
                       ListView(
                         shrinkWrap: true,
                         children: _services.keys.map((String key) {
                           return new CheckboxListTile(
+                            controlAffinity: ListTileControlAffinity.leading,
                             activeColor: primary,
                             title: new Text(
                               key,
@@ -102,8 +103,7 @@ class _DeliveryServicesState extends State<DeliveryServices> {
                             backgroundColor: primary,
                             child: Icon(Icons.keyboard_arrow_right),
                             onPressed: () {
-                              save();
-                              Navigator.pushReplacementNamed(context, '/items');
+                              _next(context);
                             },
                           ),
                         ],
@@ -122,7 +122,7 @@ class _DeliveryServicesState extends State<DeliveryServices> {
   @override
   void initState() {
     super.initState();
-    read();
+    _init();
   }
 
   Future<Null> _selectTime(BuildContext context) async {
@@ -153,7 +153,7 @@ class _DeliveryServicesState extends State<DeliveryServices> {
     return "$_h:$_m $_ampm";
   }
 
-  save() {
+  _next(context) {
     Store store = Store();
     store.save('delivery-services', _services);
     if (_services['Appointment']) {
@@ -161,13 +161,13 @@ class _DeliveryServicesState extends State<DeliveryServices> {
     } else {
       store.remove('delivery-appointment-time');
     }
+    Navigator.pushReplacementNamed(context, '/items');
   }
 
-  read() async {
+  _init() async {
     Store store = Store();
     var data = await store.read('delivery-services');
     var appointment = await store.read('delivery-appointment-time');
-
     if (data != null) {
       setState(() {
         _services['Inside pickup'] = data['Inside pickup'];

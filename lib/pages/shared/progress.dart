@@ -19,6 +19,7 @@ class _ProgressState extends State<Progress> {
         radius: 120.0,
         lineWidth: 13.0,
         animation: true,
+        animationDuration: 1200,
         percent: prgValue / 100,
         center: Text(
           "$perce%",

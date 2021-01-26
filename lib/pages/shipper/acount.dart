@@ -5,12 +5,12 @@ import 'package:shipbay/services/settings.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class Shipper extends StatefulWidget {
+class Acount extends StatefulWidget {
   @override
-  _ShipperState createState() => _ShipperState();
+  _AcountState createState() => _AcountState();
 }
 
-class _ShipperState extends State<Shipper> {
+class _AcountState extends State<Acount> {
   String _name;
   String _email;
   @override
@@ -24,7 +24,7 @@ class _ShipperState extends State<Shipper> {
           Builder(
             builder: (context) => IconButton(
               icon: Icon(
-                Icons.location_on,
+                Icons.edit,
                 color: primary,
               ),
               onPressed: () => Scaffold.of(context).openEndDrawer(),
@@ -58,7 +58,7 @@ class _ShipperState extends State<Shipper> {
     String _token = await store.read('token');
     try {
       var response =
-          await http.get('http://192.168.2.36:8000/api/auth/me', headers: {
+          await http.get('http://192.168.2.14:8000/api/auth/me', headers: {
         'Authorization': 'Bearer ${_token}',
         'Content-Type': 'application/x-www-form-urlencoded'
       });

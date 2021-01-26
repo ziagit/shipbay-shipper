@@ -29,6 +29,8 @@ class _PickupState extends State<Pickup> {
   String street;
   String street_number;
   String formatted_address;
+  final _formKey = GlobalKey<FormState>();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -51,21 +53,28 @@ class _PickupState extends State<Pickup> {
       body: ListView(
         children: <Widget>[
           Padding(
-              padding: const EdgeInsets.all(30.0),
+              padding: const EdgeInsets.all(20.0),
               child: Column(
                 children: <Widget>[
                   SizedBox(child: Progress(progress: 0.0)),
-                  SizedBox(
+                  Form(
+                    key: _formKey,
                     child: Column(
                       children: <Widget>[
                         Text(
                           "Pickup address",
-                          style: TextStyle(fontSize: 24.0, height: 2.0),
+                          style: TextStyle(fontSize: 22.0, height: 2.0),
                         ),
                         SizedBox(height: 16.0),
                         TextFormField(
                           controller: _addressController,
                           decoration: InputDecoration(hintText: 'Postal code'),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter a valid address';
+                            }
+                            return null;
+                          },
                           onChanged: (keyword) {
                             _openDialog(context, keyword);
                           },
@@ -73,56 +82,52 @@ class _PickupState extends State<Pickup> {
                         SizedBox(height: 16.0),
                         Row(
                           children: <Widget>[
-                            Row(
-                              children: <Widget>[
-                                Radio(
-                                    activeColor: primary,
-                                    value: "bs",
-                                    groupValue: groupValue,
-                                    onChanged: (val) {
-                                      setState(() {
-                                        groupValue = val;
-                                      });
-                                    }),
-                                Text(
-                                  "Business",
-                                  style: TextStyle(fontSize: 11.0),
-                                ),
-                              ],
+                            Radio(
+                                activeColor: primary,
+                                value: "bs",
+                                groupValue: groupValue,
+                                onChanged: (val) {
+                                  setState(() {
+                                    groupValue = val;
+                                  });
+                                }),
+                            Text(
+                              "Business",
+                              style: TextStyle(fontSize: 11.0),
                             ),
-                            Row(
-                              children: <Widget>[
-                                Radio(
-                                    activeColor: primary,
-                                    value: "rs",
-                                    groupValue: groupValue,
-                                    onChanged: (val) {
-                                      setState(() {
-                                        groupValue = val;
-                                      });
-                                    }),
-                                Text(
-                                  "Residential",
-                                  style: TextStyle(fontSize: 11.0),
-                                ),
-                              ],
+                          ],
+                        ),
+                        Row(
+                          children: <Widget>[
+                            Radio(
+                                activeColor: primary,
+                                value: "rs",
+                                groupValue: groupValue,
+                                onChanged: (val) {
+                                  setState(() {
+                                    groupValue = val;
+                                  });
+                                }),
+                            Text(
+                              "Residential",
+                              style: TextStyle(fontSize: 11.0),
                             ),
-                            Row(
-                              children: <Widget>[
-                                Radio(
-                                    activeColor: primary,
-                                    value: "sp",
-                                    groupValue: groupValue,
-                                    onChanged: (val) {
-                                      setState(() {
-                                        groupValue = val;
-                                      });
-                                    }),
-                                Text(
-                                  "Special location",
-                                  style: TextStyle(fontSize: 11.0),
-                                ),
-                              ],
+                          ],
+                        ),
+                        Row(
+                          children: <Widget>[
+                            Radio(
+                                activeColor: primary,
+                                value: "sp",
+                                groupValue: groupValue,
+                                onChanged: (val) {
+                                  setState(() {
+                                    groupValue = val;
+                                  });
+                                }),
+                            Text(
+                              "Special location",
+                              style: TextStyle(fontSize: 11.0),
                             ),
                           ],
                         ),
@@ -132,9 +137,9 @@ class _PickupState extends State<Pickup> {
                           backgroundColor: primary,
                           child: Icon(Icons.keyboard_arrow_right),
                           onPressed: () {
-                            save();
-                            Navigator.pushReplacementNamed(
-                                context, '/pickup-services');
+                            if (_formKey.currentState.validate()) {
+                              _next(context);
+                            }
                           },
                         ),
                       ],
@@ -149,7 +154,7 @@ class _PickupState extends State<Pickup> {
 
   @override
   void initState() {
-    read();
+    _init();
     super.initState();
   }
 
@@ -176,7 +181,7 @@ class _PickupState extends State<Pickup> {
     );
   }
 
-  save() async {
+  _next(context) async {
     PickupAddressModel pickupAddressModel = PickupAddressModel();
     pickupAddressModel.country = country;
     pickupAddressModel.state = state;
@@ -187,9 +192,10 @@ class _PickupState extends State<Pickup> {
     pickupAddressModel.formatted_address = formatted_address;
     pickupAddressModel.location_type = groupValue;
     await store.save('pickup', pickupAddressModel);
+    Navigator.pushReplacementNamed(context, '/pickup-services');
   }
 
-  read() async {
+  _init() async {
     var data = await store.read('pickup');
     if (data != null) {
       setState(() {
