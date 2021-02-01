@@ -114,9 +114,11 @@ class _PickupServicesState extends State<PickupServices> {
   _init() async {
     Store store = Store();
     var data = await store.read('pickup-services');
-    setState(() {
-      _services['Inside pickup'] = data['Inside pickup'];
-      _services['Tailgate'] = data['Tailgate'];
-    });
+    if (data != null) {
+      setState(() {
+        _services['Inside pickup'] = data['Inside pickup'];
+        _services['Tailgate'] = data['Tailgate'];
+      });
+    }
   }
 }

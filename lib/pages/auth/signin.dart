@@ -9,6 +9,8 @@ class Signin extends StatefulWidget {
 }
 
 class _SigninState extends State<Signin> {
+  Store store = Store();
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
@@ -16,6 +18,7 @@ class _SigninState extends State<Signin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         backgroundColor: Color(0xF8FAF8),
         elevation: 0.0,
@@ -162,28 +165,44 @@ class _SigninState extends State<Signin> {
   }
 
   _pendingOrder() async {
-    Store store = Store();
     var data = store.read('pickup');
     if (data != null) {
-      return true;
+      //order is pending
     }
-    return false;
   }
 
   Future<Map<String, dynamic>> _login(context) async {
+    var additionalDetails = store.read('additional-details');
     setState(() {
       _isLoading = true;
     });
     Login instance =
         Login(_emailController.text, _passwordController.text, context);
-    await instance.login().then((response) => {}).whenComplete(
-          () => {
-            setState(
-              () {
-                _isLoading = false;
-              },
-            ),
-            Navigator.pushReplacementNamed(context, '/home'),
+    await instance.login().then(
+          (response) => {
+            if (response['token'] != null)
+              {
+                if (additionalDetails != null)
+                  {
+                    _isLoading = false,
+                    store.save('token', response['token']),
+                    Navigator.pushReplacementNamed(context, '/payment-details'),
+                  }
+                else
+                  {
+                    _isLoading = false,
+                    store.save('token', response['token']),
+                    Navigator.pushReplacementNamed(context, '/home'),
+                  }
+              }
+            else
+              {
+                setState(() {
+                  _isLoading = false;
+                }),
+                _scaffoldKey.currentState
+                    .showSnackBar(SnackBar(content: Text(response['message']))),
+              }
           },
         );
   }

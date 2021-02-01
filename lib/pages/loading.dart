@@ -26,9 +26,9 @@ class _LoadingState extends State<Loading> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: SpinKitFadingCircle(
+        child: SpinKitCubeGrid(
           color: primary,
-          size: 80.0,
+          size: 50.0,
         ),
       ),
     );

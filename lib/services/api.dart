@@ -5,6 +5,7 @@ import 'package:shipbay/models/accessory.dart';
 import 'package:shipbay/models/carrier_model.dart';
 import 'package:shipbay/pages/store/store.dart';
 import 'package:shipbay/services/settings.dart';
+import 'package:stripe_payment/stripe_payment.dart';
 
 class Countries {
   String name;
@@ -45,7 +46,7 @@ class Carriers {
   Carriers(this.url, this.order);
   Future<List<Carrier>> getCarriers() async {
     var response = await http.post(
-      "http://104.154.95.189/api/carriers-rate",
+      "http://35.184.16.20/api/carriers-rate",
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -71,13 +72,11 @@ class Login {
         'email': email,
         'password': password,
       };
-      var response = await http.post('http://192.168.2.14:8000/api/auth/signin',
+      var response = await http.post('$baseUrl/auth/signin',
           body: body,
           headers: {'Content-Type': 'application/x-www-form-urlencoded'});
       var data = jsonDecode(response.body);
-      if (data['token'] != null) {
-        store.save('token', data['token']);
-      }
+      return data;
     } catch (err) {
       print('err: ${err.toString()}');
     }
@@ -103,14 +102,14 @@ class Register {
         'password_confirmation': password_confirmation,
         'role': role,
       };
-      var response = await http.post('http://192.168.2.14:8000/api/auth/signup',
+      var response = await http.post('$baseUrl/auth/signup',
           body: body,
           headers: {'Content-Type': 'application/x-www-form-urlencoded'});
       var data = jsonDecode(response.body);
       if (data['token'] != null) {
-        Store store = Store();
-        store.save('token', data['token']);
+        return data;
       }
+      return null;
     } catch (err) {
       print('err: ${err.toString()}');
     }
@@ -122,12 +121,10 @@ class Logout {
   Store store = Store();
   BuildContext context;
   Logout(this.context);
-  Future<Map<String, dynamic>> logout() async {
-    String _token = await store.read('token');
+  Future<Map<String, dynamic>> logout(token) async {
     try {
-      var response = await http
-          .post('http://192.168.2.14:8000/api/auth/signout', headers: {
-        'Authorization': 'Bearer ${_token}',
+      await http.post('$baseUrl/auth/signout', headers: {
+        'Authorization': 'Bearer ${token}',
         'Content-Type': 'application/x-www-form-urlencoded'
       });
       store.remove('token');
@@ -141,13 +138,10 @@ class Logout {
 
 class Details {
   Details();
-  Future<Map<String, dynamic>> details() async {
-    Store store = Store();
-    String _token = await store.read('token');
+  Future<Map<String, dynamic>> details(token) async {
     try {
-      var response =
-          await http.get('http://192.168.2.14:8000/api/auth/me', headers: {
-        'Authorization': 'Bearer ${_token}',
+      var response = await http.get('$baseUrl/auth/me', headers: {
+        'Authorization': 'Bearer ${token}',
         'Content-Type': 'application/x-www-form-urlencoded'
       });
       var data = jsonDecode(response.body);
@@ -163,7 +157,7 @@ class ItemType {
   ItemType();
   Future<Map<String, dynamic>> types() async {
     try {
-      var response = await http.get('http://192.168.2.14:8000/api/item-type',
+      var response = await http.get('$baseUrl/item-type',
           headers: {'Content-Type': 'application/x-www-form-urlencoded'});
       var data = jsonDecode(response.body);
       return data;
@@ -172,4 +166,144 @@ class ItemType {
     }
     return null;
   }
+}
+
+Future<Map<String, dynamic>> getProfile(token) async {
+  try {
+    var response = await http.get(
+      '$baseUrl/shipper/details',
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+    );
+    return jsonDecode(response.body);
+  } catch (err) {
+    print('err: ${err.toString()}');
+  }
+  return null;
+}
+
+Future<Map<String, dynamic>> save(data, token) async {
+  try {
+    final response = await http.post('$baseUrl/shipper/details',
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json'
+        },
+        body: data);
+    return jsonDecode(response.body);
+  } catch (err) {
+    print('err: ${err.toString()}');
+  }
+  return null;
+}
+
+Future<List> getOrders(token) async {
+  try {
+    var response = await http.get('$baseUrl/shipper/orders', headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/x-www-form-urlencoded'
+    });
+    return jsonDecode(response.body);
+  } catch (err) {
+    print('err: ${err.toString()}');
+  }
+  return null;
+}
+
+Future<Map> getOrder(id, token) async {
+  try {
+    var response = await http.get('$baseUrl/shipper/orders/' + id, headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/x-www-form-urlencoded'
+    });
+    return jsonDecode(response.body);
+  } catch (err) {
+    print('err: ${err.toString()}');
+  }
+  return null;
+}
+
+Future<Map> getCard(token) async {
+  try {
+    var response = await http.get('$baseUrl/shipper/card-details', headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/x-www-form-urlencoded'
+    });
+    return jsonDecode(response.body);
+  } catch (err) {
+    print('err: ${err.toString()}');
+  }
+  return null;
+}
+
+Future<Map<String, dynamic>> addCard(carrier, data, token) async {
+  try {
+    var response = await http.post(
+      '$baseUrl/charge',
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: jsonEncode(<String, Object>{
+        'price': carrier['price'],
+        'stripeToken': data['token'],
+        'email': data['email'],
+        'address': data['address'],
+        'city': data['city'],
+        'state': data['state'],
+        'postalcode': data['postalcode'],
+        'name': data['name']
+      }),
+    );
+    return jsonDecode(response.body);
+  } catch (err) {
+    print('err charging user: ${err.toString()}');
+  }
+  return null;
+}
+
+Future<Map<String, dynamic>> chargeNow(carrier, data) async {
+  try {
+    var response = await http.post(
+      '$baseUrl/charge',
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(<String, Object>{
+        'price': carrier['price'],
+        'stripeToken': data['token'],
+        'email': data['email'],
+        'address': data['address'],
+        'city': data['city'],
+        'state': data['state'],
+        'postalcode': data['postalcode'],
+        'name': data['name']
+      }),
+    );
+    return jsonDecode(response.body);
+  } catch (err) {
+    print('err charging user: ${err.toString()}');
+  }
+  return null;
+}
+
+Future<Map<String, dynamic>> chargeCustomer(carrier, billing, token) async {
+  try {
+    var response = await http.post(
+      '$baseUrl/charge-customer',
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json'
+      },
+      body: jsonEncode(<String, dynamic>{
+        "price": carrier['price'],
+        "id": billing['orderId'],
+        "email": billing['email']
+      }),
+    );
+    return jsonDecode(response.body);
+  } catch (err) {
+    print('err charging user: ${err.toString()}');
+  }
+  return null;
 }

@@ -12,6 +12,7 @@ class Signup extends StatefulWidget {
 
 class _SignupState extends State<Signup> {
   bool _isLoading = false;
+  Store store = Store();
   TextEditingController _nameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
@@ -160,7 +161,6 @@ class _SignupState extends State<Signup> {
     setState(() {
       _isLoading = true;
     });
-    print(_isLoading);
     Register instance = Register(
         _nameController.text,
         _emailController.text,
@@ -168,12 +168,16 @@ class _SignupState extends State<Signup> {
         _confirmPasswordController.text,
         _role,
         context);
-    instance.register().then((response) => {}).whenComplete(
-          () => {
-            setState(() {
-              _isLoading = false;
-            }),
-            Navigator.pushReplacementNamed(context, '/welcome'),
+    instance.register().then(
+          (response) => {
+            if (response['token'] != null)
+              {
+                store.save('token', response['token']),
+                setState(() {
+                  _isLoading = false;
+                }),
+                Navigator.pushReplacementNamed(context, '/welcome'),
+              }
           },
         );
   }

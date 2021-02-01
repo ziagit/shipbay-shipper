@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:shipbay/services/settings.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
+import 'package:progress_indicators/progress_indicators.dart';
 
 class Carriers extends StatefulWidget {
   @override
@@ -65,14 +66,21 @@ class _CarriersState extends State<Carriers> {
                 ),
                 SizedBox(height: 16.0),
                 FutureBuilder(
-                  future: _getCarriers(),
+                  future: _get(),
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
                     if (snapshot.data == null) {
                       return Container(
                         decoration: _customStyle(context),
                         padding: const EdgeInsets.all(8.0),
                         child: Center(
-                          child: Text("Loading..."),
+                          child: Row(
+                            children: [
+                              Text("Loading"),
+                              JumpingDotsProgressIndicator(
+                                fontSize: 20.0,
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     } else {
@@ -257,15 +265,17 @@ class _CarriersState extends State<Carriers> {
     if (itemConditions['Temperature sensitive']) {
       order['myItem']['conditions'].add('tm');
     }
-    order['myItem']['maxTemp'] = itemTemperature['max_temp'].toString();
-    order['myItem']['minTemp'] = itemTemperature['min_temp'].toString();
+
+    order['myItem']['maxTemp'] =
+        itemTemperature == null ? null : itemTemperature['max_temp'];
+    order['myItem']['minTemp'] =
+        itemTemperature == null ? null : itemTemperature['min_temp'];
   }
 
-  Future<List<Carrier>> _getCarriers() async {
-    print("getting carrier...");
+  Future<List<Carrier>> _get() async {
     try {
       Response response = await post(
-        "http://192.168.2.14:8000/api/carriers-rate",
+        "http://35.184.16.20/api/carriers-rate",
         headers: <String, String>{
           'Content-Type': 'application/json',
         },

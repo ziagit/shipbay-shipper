@@ -89,7 +89,7 @@ class _ItemsState extends State<Items> {
                                               style: TextStyle(fontSize: 12.0)),
                                           SizedBox(width: 20.0),
                                           Text(
-                                              "${_items[index].weight.toString()} Pounds",
+                                              "${(_items[index].weight * _items[index].number).toString()} Pounds",
                                               style: TextStyle(fontSize: 12.0)),
                                         ],
                                       ),
@@ -351,7 +351,7 @@ class _AddItemState extends State<AddItem> {
                 child: TextFormField(
                   controller: _lengthController,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(labelText: 'Length'),
+                  decoration: InputDecoration(labelText: 'Length(in)'),
                   style: TextStyle(fontSize: 12.0),
                   validator: (value) {
                     if (value.isEmpty) {
@@ -365,7 +365,7 @@ class _AddItemState extends State<AddItem> {
                 child: TextFormField(
                   controller: _widthController,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(labelText: 'Width'),
+                  decoration: InputDecoration(labelText: 'Width(in)'),
                   style: TextStyle(fontSize: 12.0),
                   validator: (value) {
                     if (value.isEmpty) {
@@ -379,7 +379,7 @@ class _AddItemState extends State<AddItem> {
                 child: TextFormField(
                   controller: _heightController,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(labelText: 'Height'),
+                  decoration: InputDecoration(labelText: 'Height(in)'),
                   validator: (value) {
                     if (value.isEmpty) {
                       return 'Enter > 0';
@@ -397,7 +397,7 @@ class _AddItemState extends State<AddItem> {
                 child: TextFormField(
                   controller: _weightController,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(hintText: 'Weight'),
+                  decoration: InputDecoration(hintText: 'Weight(in)'),
                   style: TextStyle(fontSize: 12.0),
                   validator: (value) {
                     if (value.isEmpty) {
@@ -425,7 +425,7 @@ class _AddItemState extends State<AddItem> {
           ),
           SizedBox(height: 20.0),
           IconButton(
-              icon: Icon(Icons.add_circle_outline),
+              icon: Icon(Icons.add_circle_outline, color: primary),
               onPressed: () {
                 if (_formKey.currentState.validate()) {
                   _add(context);

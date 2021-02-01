@@ -73,8 +73,12 @@ class _ConfirmationState extends State<Confirmation> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text("Pickup details",
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Text("Pickup details",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: primary)),
+                  ),
                   Row(
                     children: [
                       Text("Name: "),
@@ -120,8 +124,14 @@ class _ConfirmationState extends State<Confirmation> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text("Delivery details",
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      "Delivery details",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: primary),
+                    ),
+                  ),
                   Row(
                     children: [
                       Text("Name: "),
@@ -179,8 +189,14 @@ class _ConfirmationState extends State<Confirmation> {
                       decoration: _customStyle(context),
                       child: Column(
                         children: [
-                          Text("Item details",
-                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          Align(
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              "Item details",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, color: primary),
+                            ),
+                          ),
                           ListView.builder(
                             shrinkWrap: true,
                             itemCount: _items.length,
@@ -218,8 +234,14 @@ class _ConfirmationState extends State<Confirmation> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text("Carrier details",
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      "Carrier details",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: primary),
+                    ),
+                  ),
                   Align(
                       alignment: Alignment.centerLeft,
                       child: Text("Name: $_carrierName")),
@@ -241,8 +263,14 @@ class _ConfirmationState extends State<Confirmation> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text("Billing details",
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      "Billing details",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: primary),
+                    ),
+                  ),
                   Align(
                       alignment: Alignment.centerLeft,
                       child: Text("Email: $_email")),
@@ -298,6 +326,7 @@ class _ConfirmationState extends State<Confirmation> {
                   padding: EdgeInsets.all(20.0),
                   child: LinearProgressIndicator(
                     valueColor: AlwaysStoppedAnimation(primary),
+                    backgroundColor: Colors.grey[300],
                   ),
                 )
               : Padding(
@@ -362,7 +391,7 @@ class _ConfirmationState extends State<Confirmation> {
     });
     try {
       Response response = await post(
-        "http://192.168.2.14:8000/api/confirm",
+        "$baseUrl/confirm",
         headers: <String, String>{
           'Content-Type': 'application/json',
         },

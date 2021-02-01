@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shipbay/pages/store/store.dart';
 import 'dart:convert';
 import 'package:shipbay/services/api.dart';
+import 'package:shipbay/services/settings.dart';
 
 class MainMenu extends StatefulWidget {
   @override
@@ -27,15 +28,17 @@ class _MainMenuState extends State<MainMenu> {
               child: Column(
                 children: <Widget>[
                   Container(
-                    width: 100.0,
-                    height: 100.0,
+                    width: 80.0,
+                    height: 80.0,
                     margin: EdgeInsets.only(top: 30.0),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                          image: NetworkImage(
-                              'https://s3.amazonaws.com/creativetim_bucket/new_logo.png'),
-                          fit: BoxFit.fill),
+                    child: CircleAvatar(
+                      radius: 25.0,
+                      child: Text("S",
+                          style: TextStyle(
+                              fontSize: 26.0,
+                              color: primary,
+                              fontWeight: FontWeight.bold)),
+                      backgroundColor: Colors.white,
                     ),
                   ),
                   Visibility(
@@ -48,7 +51,7 @@ class _MainMenuState extends State<MainMenu> {
                         ),
                         Text(
                           "$_email",
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(fontSize: 12.0, color: Colors.white),
                         )
                       ],
                     ),
@@ -152,35 +155,34 @@ class _MainMenuState extends State<MainMenu> {
 
   Future<Map<String, dynamic>> _logout(context) async {
     Logout instance = Logout(context);
-    await instance.logout().then((response) => {}).whenComplete(
-          () => {
-            setState(() {
-              _isLogedin = false;
-            }),
-            Navigator.pushReplacementNamed(context, '/home'),
-          },
-        );
-    return null;
+    String token = await store.read('token');
+    if (token != null) {
+      await instance.logout(token).then((response) => {}).whenComplete(
+            () => {
+              setState(() {
+                _isLogedin = false;
+              }),
+              Navigator.pushReplacementNamed(context, '/home'),
+            },
+          );
+      return null;
+    }
   }
 
   Future<Map<String, dynamic>> _getDetails() async {
     Details instance = Details();
-    Store store = Store();
+
     String token = await store.read('token');
     if (token != null) {
-      await instance
-          .details()
-          .then((response) => {
-                print(response),
-                setState(() {
+      await instance.details(token).then(
+            (response) => {
+              setState(
+                () {
                   _name = response['name'];
                   _email = response['email'];
                   _isLogedin = true;
-                }),
-              })
-          .whenComplete(
-            () => {
-              setState(() {}),
+                },
+              ),
             },
           );
     }

@@ -4,8 +4,7 @@ import 'package:shipbay/pages/shared/progress.dart';
 import 'package:shipbay/pages/store/store.dart';
 import 'package:shipbay/services/settings.dart';
 import 'package:stripe_payment/stripe_payment.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:shipbay/services/api.dart';
 
 class PaymentDetails extends StatefulWidget {
   @override
@@ -14,6 +13,7 @@ class PaymentDetails extends StatefulWidget {
 
 class _PaymentDetailsState extends State<PaymentDetails> {
   double _progress = 85.0;
+  bool _loading = false;
   String _paymentMessage = "Add your card information";
   Color _successColor = Colors.black;
   String _paymentStatus;
@@ -46,9 +46,9 @@ class _PaymentDetailsState extends State<PaymentDetails> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10.0),
                     boxShadow: [
-                      new BoxShadow(
+                      BoxShadow(
                         color: Colors.grey.shade200,
-                        offset: new Offset(0.0, 10.0),
+                        offset: Offset(0.0, 10.0),
                         blurRadius: 10.0,
                         spreadRadius: 1.0,
                       )
@@ -59,11 +59,10 @@ class _PaymentDetailsState extends State<PaymentDetails> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Text(
-                        _paymentMessage,
-                        style: TextStyle(
-                            color: _successColor == null ? '' : _successColor),
+                        _paymentMessage ?? '',
+                        style: TextStyle(color: _successColor ?? ''),
                       ),
-                      _paymentStatus == null
+                      (_paymentStatus == 'unpaid' || _paymentStatus == null)
                           ? RaisedButton(
                               color: primary,
                               child: Text(
@@ -95,7 +94,7 @@ class _PaymentDetailsState extends State<PaymentDetails> {
                             ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -129,60 +128,61 @@ class _PaymentDetailsState extends State<PaymentDetails> {
         ),
       ),
     ).then((Object value) {
-      setState(() {
-        _charge(value);
-      });
+      _charge(value);
+    });
+  }
+
+  _charge(card) async {
+    var token = await store.read('token');
+    var carrier = await store.read('carrier');
+    if (token != null) {
+      _addCard(carrier, card, token);
+    } else {
+      _chargeNow(carrier, card);
+    }
+    setState(() {
+      _loading = true;
     });
   }
 
   _init() async {
-    var data = await store.read('billing');
-    if (data != null) {
+    var billing = await store.read('billing');
+    if (billing != null && billing['status'] == 'paid') {
       setState(() {
         _progress = 100.0;
-        _paymentStatus = data['status'];
-        _paymentMessage = data['message'];
+        _paymentStatus = billing['status'];
+        _paymentMessage = billing['message'];
         _successColor = Colors.green;
       });
     }
   }
 
-  Future<Map<String, dynamic>> _charge(data) async {
-    print(data['token']);
-    var carrier = await store.read('carrier');
-    try {
-      var response = await http.post(
-        'http://192.168.2.14:8000/api/charge',
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(<String, Object>{
-          'price': carrier['price'],
-          'stripeToken': data['token'],
-          'email': data['email'],
-          'address': data['address'],
-          'city': data['city'],
-          'state': data['state'],
-          'postalcode': data['postalcode'],
-          'name': data['name']
-        }),
-      );
-      var jsonData = jsonDecode(response.body);
+  _addCard(carrier, card, token) async {
+    var jsonData = await addCard(carrier, card, token);
+    store.save('billing', {
+      'status': jsonData['status'],
+      'email': jsonData['email'],
+      'message': jsonData['message'],
+      'orderId': jsonData['id']
+    });
+    Navigator.pushReplacementNamed(context, '/card',
+        arguments: jsonData['message']);
+  }
 
-      store.save('billing', {
-        'status': jsonData['status'],
-        'email': jsonData['email'],
-        'message': jsonData['message'],
-        'orderId': jsonData['id']
-      });
-      setState(() {
-        _progress = 100.0;
-        _paymentMessage = jsonData['message'];
-        _successColor = Colors.green;
-        _paymentStatus = jsonData['status'];
-      });
-    } catch (err) {
-      print('err charging user: ${err.toString()}');
-    }
-    return null;
+  _chargeNow(carrier, data) async {
+    var jsonData = await chargeNow(carrier, data);
+    store.save('billing', {
+      'status': jsonData['status'],
+      'email': jsonData['email'],
+      'message': jsonData['message'],
+      'orderId': jsonData['id']
+    });
+    setState(() {
+      _progress = 100.0;
+      _paymentMessage = jsonData['message'];
+      _successColor = Colors.green;
+      _paymentStatus = jsonData['status'];
+    });
   }
 }
 
