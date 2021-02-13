@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shipbay/models/additional_details_model.dart';
+import 'package:shipbay/pages/shared/custom_appbar.dart';
+import 'package:shipbay/pages/shared/main_menu.dart';
 import 'package:shipbay/pages/shared/progress.dart';
 import 'package:shipbay/pages/store/store.dart';
+import 'package:shipbay/pages/tracking/tracking.dart';
+import 'package:shipbay/services/settings.dart';
 
 class AdditionalDetails extends StatefulWidget {
   @override
@@ -19,29 +23,21 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
   TextEditingController _deliveryNameController = TextEditingController();
   TextEditingController _deliveryPhoneController = TextEditingController();
   TextEditingController _deliveryEmailController = TextEditingController();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xF8FAF8),
-        elevation: 0.0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/items');
-          },
-        ),
-      ),
+      key: _scaffoldKey,
+      appBar: CustomAppBar(''),
+      drawer: MainMenu(),
+      endDrawer: Tracking(),
       body: ListView(
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
               children: <Widget>[
-                Container(child: Progress(progress: 73.0)),
+                Container(child: Progress(progress: 65.0)),
                 Container(
                   child: Form(
                     key: _formKey,
@@ -53,6 +49,7 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
                         ),
                         SizedBox(height: 16.0),
                         TextFormField(
+                          style: TextStyle(fontSize: 14.0),
                           controller: _estimatedCostController,
                           keyboardType: TextInputType.number,
                           validator: (value) {
@@ -62,9 +59,10 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
                             return null;
                           },
                           decoration: InputDecoration(
-                              labelText: 'Estimated shipment value'),
+                              labelText: 'Estimated shipment value(\$)'),
                         ),
                         TextFormField(
+                          style: TextStyle(fontSize: 14.0),
                           controller: _instructionsController,
                           decoration:
                               InputDecoration(labelText: 'Instructions'),
@@ -83,7 +81,8 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
                               style: TextStyle(fontSize: 12.0),
                               validator: (value) {
                                 if (value.isEmpty) {
-                                  return 'Please enter a valid name';
+                                  return validate(
+                                      'Please enter a valid name for pickup!');
                                 }
                                 return null;
                               },
@@ -98,7 +97,8 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
                               style: TextStyle(fontSize: 12.0),
                               validator: (value) {
                                 if (value.isEmpty) {
-                                  return 'Please enter a valid phone number';
+                                  return validate(
+                                      'Please enter a valid phone number for pickup!');
                                 }
                                 return null;
                               },
@@ -109,7 +109,8 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
                               style: TextStyle(fontSize: 12.0),
                               validator: (value) {
                                 if (value.isEmpty) {
-                                  return 'Please enter a valid email';
+                                  return validate(
+                                      'Please enter a valid email for pickup!');
                                 }
                                 return null;
                               },
@@ -125,7 +126,8 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
                               style: TextStyle(fontSize: 12.0),
                               validator: (value) {
                                 if (value.isEmpty) {
-                                  return 'Please enter a valid name';
+                                  return validate(
+                                      'Please enter a valid name for delivery!');
                                 }
                                 return null;
                               },
@@ -137,7 +139,8 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
                               style: TextStyle(fontSize: 12.0),
                               validator: (value) {
                                 if (value.isEmpty) {
-                                  return 'Please enter a valid phone number';
+                                  return validate(
+                                      'Please enter a valid phone number for delivery!');
                                 }
                                 return null;
                               },
@@ -148,36 +151,10 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
                               style: TextStyle(fontSize: 12.0),
                               validator: (value) {
                                 if (value.isEmpty) {
-                                  return 'Please enter a valid email';
+                                  return validate(
+                                      'Please enter a valid email for delivery!');
                                 }
                                 return null;
-                              },
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 24.0),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            FloatingActionButton(
-                              heroTag: 0,
-                              backgroundColor: Colors.orange[50],
-                              foregroundColor: Colors.orange[900],
-                              child: Icon(Icons.keyboard_arrow_left),
-                              onPressed: () {
-                                Navigator.pushReplacementNamed(
-                                    context, '/items');
-                              },
-                            ),
-                            SizedBox(width: 16.0),
-                            FloatingActionButton(
-                              heroTag: 1,
-                              backgroundColor: Colors.orange[900],
-                              child: Icon(Icons.keyboard_arrow_right),
-                              onPressed: () {
-                                if (_formKey.currentState.validate()) {
-                                  _next(context);
-                                }
                               },
                             ),
                           ],
@@ -191,6 +168,37 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
           )
         ],
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            FloatingActionButton(
+              backgroundColor: inActive,
+              foregroundColor: primary,
+              heroTag: "btn",
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/items');
+              },
+              child: Icon(Icons.keyboard_arrow_left),
+            ),
+            SizedBox(
+              width: 40,
+            ),
+            FloatingActionButton(
+              backgroundColor: primary,
+              heroTag: "btn2",
+              onPressed: () {
+                if (_formKey.currentState.validate()) {
+                  _next(context);
+                }
+              },
+              child: Icon(Icons.keyboard_arrow_right),
+            )
+          ],
+        ),
+      ),
     );
   }
 
@@ -198,6 +206,12 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
   void initState() {
     _init();
     super.initState();
+  }
+
+  validate(value) {
+    return _scaffoldKey.currentState.showSnackBar(SnackBar(
+      content: Text(value),
+    ));
   }
 
   _init() async {
@@ -229,6 +243,17 @@ class _AdditionalDetailsState extends State<AdditionalDetails> {
     additionalDetailsModel.delivery_phone =
         int.parse(_deliveryPhoneController.text);
     additionalDetailsModel.delivery_email = _deliveryEmailController.text;
+    if (additionalDetailsModel.estimated_cost == null ||
+        additionalDetailsModel.pickup_name == null ||
+        additionalDetailsModel.pickup_email == null ||
+        additionalDetailsModel.pickup_phone == null ||
+        additionalDetailsModel.delivery_name == null ||
+        additionalDetailsModel.delivery_email == null ||
+        additionalDetailsModel.delivery_phone == null) {
+      _scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: Text("Please provide a valid contact information!"),
+      ));
+    }
     store.save('additional-details', additionalDetailsModel);
     Navigator.pushReplacementNamed(context, '/carriers');
   }

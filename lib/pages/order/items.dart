@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shipbay/models/item_model.dart';
 import 'package:shipbay/models/temperature.dart';
+import 'package:shipbay/pages/shared/custom_appbar.dart';
+import 'package:shipbay/pages/shared/main_menu.dart';
 import 'package:shipbay/pages/shared/progress.dart';
 import 'package:shipbay/pages/store/store.dart';
+import 'package:shipbay/pages/tracking/tracking.dart';
 import 'package:shipbay/services/settings.dart';
 
 class Items extends StatefulWidget {
@@ -29,26 +32,16 @@ class _ItemsState extends State<Items> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: AppBar(
-        backgroundColor: bgColor,
-        elevation: 0.0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/pickup-services');
-          },
-        ),
-      ),
+      appBar: CustomAppBar(''),
+      drawer: MainMenu(),
+      endDrawer: Tracking(),
       body: ListView(
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
               children: <Widget>[
-                SizedBox(child: Progress(progress: 61.0)),
+                SizedBox(child: Progress(progress: 55.0)),
                 SingleChildScrollView(
                   child: Column(
                     children: <Widget>[
@@ -164,31 +157,6 @@ class _ItemsState extends State<Items> {
                           ],
                         ),
                       ),
-                      SizedBox(height: 16.0),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          FloatingActionButton(
-                            heroTag: 0,
-                            backgroundColor: Colors.orange[50],
-                            foregroundColor: Colors.orange[900],
-                            child: Icon(Icons.keyboard_arrow_left),
-                            onPressed: () {
-                              Navigator.pushReplacementNamed(
-                                  context, '/delivery-services');
-                            },
-                          ),
-                          SizedBox(width: 12.0),
-                          FloatingActionButton(
-                            heroTag: 1,
-                            backgroundColor: Colors.orange[900],
-                            child: Icon(Icons.keyboard_arrow_right),
-                            onPressed: () {
-                              _next(context);
-                            },
-                          ),
-                        ],
-                      ),
                     ],
                   ),
                 ),
@@ -196,6 +164,35 @@ class _ItemsState extends State<Items> {
             ),
           )
         ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            FloatingActionButton(
+              backgroundColor: inActive,
+              foregroundColor: primary,
+              heroTag: "btn",
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/delivery-services');
+              },
+              child: Icon(Icons.keyboard_arrow_left),
+            ),
+            SizedBox(
+              width: 40,
+            ),
+            FloatingActionButton(
+              backgroundColor: primary,
+              heroTag: "btn2",
+              onPressed: () {
+                _next(context);
+              },
+              child: Icon(Icons.keyboard_arrow_right),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -274,7 +271,6 @@ class _ItemsState extends State<Items> {
         content: Text('Please add your item!'),
       ));
     } else {
-      print(_items);
       store.save('items', _items);
       store.save('item-condition', _services);
 
@@ -397,7 +393,7 @@ class _AddItemState extends State<AddItem> {
                 child: TextFormField(
                   controller: _weightController,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(hintText: 'Weight(in)'),
+                  decoration: InputDecoration(hintText: 'Weight(lb)'),
                   style: TextStyle(fontSize: 12.0),
                   validator: (value) {
                     if (value.isEmpty) {

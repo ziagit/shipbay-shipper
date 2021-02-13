@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shipbay/pages/store/store.dart';
-import 'dart:convert';
 import 'package:shipbay/services/api.dart';
 import 'package:shipbay/services/settings.dart';
 
@@ -23,7 +22,7 @@ class _MainMenuState extends State<MainMenu> {
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(20.0),
-            color: Colors.orange[900],
+            color: primary,
             child: Center(
               child: Column(
                 children: <Widget>[
@@ -33,11 +32,7 @@ class _MainMenuState extends State<MainMenu> {
                     margin: EdgeInsets.only(top: 30.0),
                     child: CircleAvatar(
                       radius: 25.0,
-                      child: Text("S",
-                          style: TextStyle(
-                              fontSize: 26.0,
-                              color: primary,
-                              fontWeight: FontWeight.bold)),
+                      child: Icon(Icons.person, color: primary),
                       backgroundColor: Colors.white,
                     ),
                   ),
@@ -64,17 +59,68 @@ class _MainMenuState extends State<MainMenu> {
             visible: _isLogedin,
             child: Column(
               children: [
-                ListTile(
-                  leading: Icon(Icons.home),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16.0, 7.0, 16.0, 0.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 40.0,
+                    child: RaisedButton(
+                      color: primary,
+                      child: Text(
+                        "Book a shipment",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w600),
+                      ),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(30.0)),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, '/pickup');
+                      },
+                    ),
+                  ),
+                ),
+                Divider(),
+                /* ListTile(
+                  leading: Icon(Icons.person),
                   title: Text(
-                    "Home",
+                    "Acount",
                     style: TextStyle(fontSize: 14.0),
                   ),
                   onTap: () {
-                    Navigator.of(context).pop();
-                    Navigator.pushReplacementNamed(context, '/home');
+                    Navigator.pushReplacementNamed(context, '/acount');
+                  },
+                ), */
+                ListTile(
+                  leading: Icon(Icons.refresh),
+                  title: Text(
+                    "My Shipments",
+                    style: TextStyle(fontSize: 14.0),
+                  ),
+                  onTap: () {
+                    Navigator.pushReplacementNamed(context, '/orders');
                   },
                 ),
+                ListTile(
+                  leading: Icon(Icons.person),
+                  title: Text(
+                    "Profile",
+                    style: TextStyle(fontSize: 14.0),
+                  ),
+                  onTap: () {
+                    Navigator.pushReplacementNamed(context, '/profile');
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.credit_card),
+                  title: Text(
+                    "Payment",
+                    style: TextStyle(fontSize: 14.0),
+                  ),
+                  onTap: () {
+                    Navigator.pushReplacementNamed(context, '/card');
+                  },
+                ),
+                Divider(),
                 ListTile(
                   leading: Icon(Icons.arrow_back),
                   title: Text(
@@ -85,63 +131,101 @@ class _MainMenuState extends State<MainMenu> {
                     _logout(context);
                   },
                 ),
-                Divider(),
-                ListTile(
-                  leading: Icon(Icons.person),
-                  title: Text(
-                    "Acount",
-                    style: TextStyle(fontSize: 14.0),
-                  ),
-                  onTap: () {
-                    Navigator.pushReplacementNamed(context, '/acount');
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.details),
-                  title: Text(
-                    "Profile",
-                    style: TextStyle(fontSize: 14.0),
-                  ),
-                  onTap: () {
-                    Navigator.pushReplacementNamed(context, '/profile');
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.add_box),
-                  title: Text(
-                    "Orders",
-                    style: TextStyle(fontSize: 14.0),
-                  ),
-                  onTap: () {
-                    Navigator.pushReplacementNamed(context, '/orders');
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.credit_card),
-                  title: Text(
-                    "Card",
-                    style: TextStyle(fontSize: 14.0),
-                  ),
-                  onTap: () {
-                    Navigator.pushReplacementNamed(context, '/card');
-                  },
-                ),
               ],
             ),
           ),
           Visibility(
             visible: !_isLogedin,
-            child: ListTile(
-              leading: Icon(Icons.arrow_forward),
-              title: Text(
-                "Login",
-                style: TextStyle(fontSize: 14.0),
-              ),
-              onTap: () {
-                Navigator.pushReplacementNamed(context, '/signin');
-              },
+            child: Column(
+              children: [
+                ListTile(
+                  leading: Icon(Icons.home),
+                  title: Text(
+                    "Shipbay",
+                    style: TextStyle(fontSize: 14.0),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.pushNamed(context, '/home');
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.question_answer),
+                  title: Text(
+                    "How it works",
+                    style: TextStyle(fontSize: 14.0),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.pushNamed(context, '/how-works');
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.help_center),
+                  title: Text(
+                    "Help",
+                    style: TextStyle(fontSize: 14.0),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.pushNamed(context, '/help');
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.list_alt),
+                  title: Text(
+                    "Terms",
+                    style: TextStyle(fontSize: 14.0),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.pushNamed(context, '/terms');
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.privacy_tip),
+                  title: Text(
+                    "Privacies",
+                    style: TextStyle(fontSize: 14.0),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.pushNamed(context, '/privacy');
+                  },
+                ),
+                Divider(),
+                ListTile(
+                  leading: Icon(Icons.arrow_forward),
+                  title: Text(
+                    "Signin",
+                    style: TextStyle(fontSize: 14.0),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.pushNamed(context, '/signin');
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.person_add),
+                  title: Text(
+                    "Signup",
+                    style: TextStyle(fontSize: 14.0),
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.pushNamed(context, '/signup');
+                  },
+                ),
+              ],
             ),
           ),
+          RaisedButton(
+              child: Text("Reset"),
+              onPressed: () {
+                Store store = Store();
+                store.removeOrder();
+                Navigator.of(context).pop();
+              })
         ],
       ),
     );
@@ -153,11 +237,10 @@ class _MainMenuState extends State<MainMenu> {
     super.initState();
   }
 
-  Future<Map<String, dynamic>> _logout(context) async {
-    Logout instance = Logout(context);
+  _logout(context) async {
     String token = await store.read('token');
     if (token != null) {
-      await instance.logout(token).then((response) => {}).whenComplete(
+      logout(token, context).then((response) => {}).whenComplete(
             () => {
               setState(() {
                 _isLogedin = false;
@@ -169,22 +252,20 @@ class _MainMenuState extends State<MainMenu> {
     }
   }
 
-  Future<Map<String, dynamic>> _getDetails() async {
-    Details instance = Details();
-
+  _getDetails() async {
     String token = await store.read('token');
     if (token != null) {
-      await instance.details(token).then(
-            (response) => {
-              setState(
-                () {
-                  _name = response['name'];
-                  _email = response['email'];
-                  _isLogedin = true;
-                },
-              ),
+      shipperDetails(token).then(
+        (response) => {
+          setState(
+            () {
+              _name = response['name'];
+              _email = response['email'];
+              _isLogedin = true;
             },
-          );
+          ),
+        },
+      );
     }
   }
 }

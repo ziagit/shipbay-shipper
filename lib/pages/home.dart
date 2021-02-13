@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shipbay/pages/shared/main_menu.dart';
-import 'package:shipbay/pages/tracking/tracking.dart';
 import 'package:shipbay/services/settings.dart';
 
 class Home extends StatefulWidget {
@@ -10,100 +8,97 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  Map data = {};
+  // TRUE: register page, FALSE: login page
+  bool _register = true;
+
+  void _changeScreen() {
+    setState(() {
+      // sets it to the opposite of the current screen
+      _register = !_register;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    data = ModalRoute.of(context).settings.arguments;
     SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(statusBarColor: primary));
-    return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).requestFocus(new FocusNode());
-      },
-      child: Scaffold(
-        backgroundColor: primary,
-        appBar: AppBar(
-          backgroundColor: bgColor,
-          iconTheme: IconThemeData(color: Colors.white),
-          elevation: 0,
-          actions: [
-            Builder(
-              builder: (context) => IconButton(
-                icon: Icon(
-                  Icons.location_on,
-                  color: Colors.white,
-                ),
-                onPressed: () => Scaffold.of(context).openEndDrawer(),
-                tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
-              ),
-            ),
-          ],
+    return Scaffold(
+        body: SafeArea(
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            stops: [0.1, 0.3, 0.5, 0.7, 0.9],
+            colors: [
+              Colors.orange[800],
+              Colors.orange[300],
+              Colors.orange[200],
+              Colors.orange[200],
+              Colors.orange[200],
+            ],
+          ),
         ),
-        drawer: MainMenu(),
-        endDrawer: Tracking(),
-        body: ListView(children: <Widget>[
-          Container(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(30.0, 200.0, 30.0, 30.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Center(
+              child: Container(height: 100.0),
+            ),
+            Column(
+              children: [
+                Text(
+                  "ShipBay",
+                  style: TextStyle(
+                      fontSize: 36.0,
+                      height: 1.4,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[800]),
+                ),
+                Text(
+                  "Truck & Muscle, Anytime You Need It",
+                  style: TextStyle(
+                    height: 2.5,
+                    color: Colors.grey[800],
+                  ),
+                ),
+              ],
+            ),
+            Padding(
+              padding: EdgeInsets.all(20.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    "SB",
-                    style: TextStyle(
-                        color: Colors.white, fontSize: 64.0, height: 0.4),
-                  ),
-                  Text("ShipBay",
-                      style: TextStyle(
-                          color: Colors.white, fontSize: 28.0, height: 1.4)),
-                  Text(
-                    "The way you book your shipment",
-                    style: TextStyle(color: Colors.white, height: 1.5),
-                  ),
-                  SizedBox(height: 56.0),
-                  Container(
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26.withOpacity(0.1),
-                          spreadRadius: 5,
-                          blurRadius: 7,
-                          offset: Offset(0, 3), // changes position of shadow
-                        ),
-                      ],
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Text(
+                      "Load, haul, and deliver just about anything, whenever you need it!",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.grey[800]),
                     ),
-                    child: TextFormField(
-                      style: TextStyle(fontSize: 14.0),
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 12.0, horizontal: 16.0),
-                        hintText: 'Search a postal code',
-                        filled: true,
-                        fillColor: Colors.white,
-                        enabledBorder: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(50.0)),
-                            borderSide: BorderSide.none),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                          borderSide: BorderSide.none,
-                        ),
-                        suffixIcon: IconButton(
-                          onPressed: () {
-                            Navigator.pushReplacementNamed(context, '/pickup');
-                          },
-                          icon: Icon(Icons.search),
-                        ),
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 43.0,
+                    child: RaisedButton(
+                      color: primary,
+                      child: Text(
+                        "GET STARTED",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w600),
                       ),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(30.0)),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, '/pickup');
+                      },
                     ),
                   ),
                 ],
               ),
-            ),
-          )
-        ]),
+            )
+          ],
+        ),
       ),
-    );
+    ));
   }
 }

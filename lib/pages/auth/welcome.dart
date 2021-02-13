@@ -20,11 +20,11 @@ class Welcome extends StatelessWidget {
               ),
               Text(
                 "Please complete your registeration",
-                style: TextStyle(color: Colors.grey[800]),
+                style: TextStyle(color: primary),
               ),
               SizedBox(height: 24.0),
               RaisedButton(
-                color: Colors.orange[900],
+                color: primary,
                 child: Text(
                   "Continue",
                   style: TextStyle(

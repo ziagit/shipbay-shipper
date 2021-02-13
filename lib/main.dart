@@ -11,10 +11,15 @@ import 'package:shipbay/pages/order/confirmation.dart';
 import 'package:shipbay/pages/order/delivery.dart';
 import 'package:shipbay/pages/order/delivery_services.dart';
 import 'package:shipbay/pages/order/items.dart';
+import 'package:shipbay/pages/order/order.dart';
 import 'package:shipbay/pages/order/payment_details.dart';
 import 'package:shipbay/pages/order/pickup.dart';
 import 'package:shipbay/pages/order/pickup_date.dart';
 import 'package:shipbay/pages/order/pickup_services.dart';
+import 'package:shipbay/pages/public/help.dart';
+import 'package:shipbay/pages/public/how_works.dart';
+import 'package:shipbay/pages/public/privacy.dart';
+import 'package:shipbay/pages/public/terms.dart';
 import 'package:shipbay/pages/shipper/acount.dart';
 import 'package:shipbay/pages/shipper/card_details.dart';
 import 'package:shipbay/pages/shipper/order_details.dart';
@@ -29,6 +34,7 @@ void main() => runApp(MaterialApp(
         '/': (_) => Loading(),
         '/home': (_) => Home(),
         '/pickup': (_) => Pickup(),
+        '/order': (_) => Order(),
         '/pickup-services': (_) => PickupServices(),
         '/pickup-date': (_) => PickupDate(),
         '/delivery': (_) => Delivery(),
@@ -47,6 +53,10 @@ void main() => runApp(MaterialApp(
         '/profile': (_) => Profile(),
         '/orders': (_) => Orders(),
         '/order-details': (_) => OrderDetails(),
-        '/card': (_) => CardDetails()
+        '/card': (_) => CardDetails(),
+        '/help': (_) => Help(),
+        '/how-works': (_) => HowWorks(),
+        '/terms': (_) => Terms(),
+        '/privacy': (_) => Privacy()
       },
     ));

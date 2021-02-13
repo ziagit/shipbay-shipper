@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:shipbay/pages/shared/custom_appbar.dart';
+import 'package:shipbay/pages/shared/main_menu.dart';
+import 'package:shipbay/pages/tracking/tracking.dart';
 import 'package:shipbay/services/settings.dart';
 
 class Completed extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: CustomAppBar(''),
+      drawer: MainMenu(),
+      endDrawer: Tracking(),
       body: Center(
         child: Padding(
           padding: EdgeInsets.all(20.0),

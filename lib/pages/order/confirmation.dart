@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:shipbay/pages/shared/custom_appbar.dart';
+import 'package:shipbay/pages/shared/main_menu.dart';
 import 'package:shipbay/pages/store/store.dart';
+import 'package:shipbay/pages/tracking/tracking.dart';
 import 'package:shipbay/services/settings.dart';
 import 'package:shipbay/models/item_model.dart';
 import 'package:shipbay/pages/shared/divider.dart';
 import 'dart:convert';
-import 'package:http/http.dart';
+import 'package:shipbay/services/api.dart';
 
 class Confirmation extends StatefulWidget {
   @override
@@ -44,19 +47,9 @@ class _ConfirmationState extends State<Confirmation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: bgColor,
-        elevation: 0.0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/payment-details');
-          },
-        ),
-      ),
+      appBar: CustomAppBar(''),
+      drawer: MainMenu(),
+      endDrawer: Tracking(),
       body: ListView(
         children: [
           Center(
@@ -302,7 +295,7 @@ class _ConfirmationState extends State<Confirmation> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                        "by clicking on submit you will agree to our terms and conditions",
+                        "By clicking on submit you will agree to our terms and conditions",
                         style: TextStyle(fontSize: 12.0)),
                   ),
                   Align(
@@ -335,7 +328,7 @@ class _ConfirmationState extends State<Confirmation> {
                     width: double.infinity,
                     height: 46.0,
                     child: RaisedButton(
-                      color: Colors.orange[900],
+                      color: primary,
                       child: Text(
                         "Submit",
                         style: TextStyle(
@@ -385,52 +378,61 @@ class _ConfirmationState extends State<Confirmation> {
     return total;
   }
 
-  Future<Map<String, dynamic>> _submit(context) async {
+  void _submit(context) async {
+    print("order: $order");
+    print("order id: $_orderId");
+    print("email: $_email");
+    print("status: $_status");
+    print("carrier id: $_carrierId");
+    print("carrier name: $_carrierName");
+    print("price: $_carrierPrice");
     setState(() {
       _isSubmiting = true;
     });
     try {
-      Response response = await post(
-        "$baseUrl/confirm",
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(
-          <String, Object>{
-            "id": _orderId,
-            "billing": {"email": _email, "status": _status},
-            "carrier": {
-              "id": _carrierId,
-              "name": _carrierName,
-              "price": _carrierPrice
-            },
-            "src": order['src'],
-            "pickDate": order['pickDate'],
-            "des": order['des'],
-            "myItem": order['myItem'],
-            "shipper": {
-              "deliveryEmail": _deliveryEmail,
-              "deliveryName": _deliveryName,
-              "deliveryPhone": _deliveryPhone,
-              "estimatedValue": _estimationCost,
-              "instructions": _instructions,
-              "pickupEmail": _pickupEmail,
-              "pickupName": _pickupName,
-              "pickupPhone": _pickupPhone
-            }
+      var response = await confirm(jsonEncode(
+        <String, Object>{
+          "id": _orderId,
+          "billing": {"email": _email, "status": _status},
+          "carrier": {
+            "id": _carrierId,
+            "name": _carrierName,
+            "price": _carrierPrice
           },
-        ),
-      );
+          "src": order['src'],
+          "pickDate": order['pickDate'],
+          "des": order['des'],
+          "myItem": order['myItem'],
+          "shipper": {
+            "deliveryEmail": _deliveryEmail,
+            "deliveryName": _deliveryName,
+            "deliveryPhone": _deliveryPhone,
+            "estimatedValue": _estimationCost,
+            "instructions": _instructions,
+            "pickupEmail": _pickupEmail,
+            "pickupName": _pickupName,
+            "pickupPhone": _pickupPhone
+          }
+        },
+      ));
       var jsonData = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        //clean the store
+        print("order creaded successfully!...");
+        store.removeOrder();
+        Navigator.pushReplacementNamed(context, '/completed');
+      } else {
+        print("oh! something is wront......");
+        print(jsonData['error']['message']);
+        setState(() {
+          _isSubmiting = false;
+        });
+      }
+    } catch (err) {
       setState(() {
         _isSubmiting = false;
       });
-      //clean the store
-      store.removeOrder();
-      print("order creaded ..................");
-      print(jsonData);
-      Navigator.pushReplacementNamed(context, '/completed');
-    } catch (err) {
+      print("..............Something is wrong.................");
       print('err: ${err.toString()}');
     }
     return null;

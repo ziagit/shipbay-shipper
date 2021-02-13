@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:shipbay/pages/shared/custom_appbar.dart';
+import 'package:shipbay/pages/shared/main_menu.dart';
 import 'package:shipbay/pages/shared/progress.dart';
 import 'package:shipbay/pages/store/store.dart';
+import 'package:shipbay/pages/tracking/tracking.dart';
 import 'package:shipbay/services/settings.dart';
 
 class DeliveryServices extends StatefulWidget {
@@ -22,26 +25,16 @@ class _DeliveryServicesState extends State<DeliveryServices> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xF8FAF8),
-        elevation: 0.0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/delivery');
-          },
-        ),
-      ),
+      appBar: CustomAppBar(''),
+      drawer: MainMenu(),
+      endDrawer: Tracking(),
       body: ListView(
         children: [
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
               children: <Widget>[
-                Container(child: Progress(progress: 50.0)),
+                Container(child: Progress(progress: 45.0)),
                 Container(
                   child: Column(
                     children: <Widget>[
@@ -83,31 +76,6 @@ class _DeliveryServicesState extends State<DeliveryServices> {
                           decoration: InputDecoration(hintText: 'Select time'),
                         ),
                       ),
-                      SizedBox(height: 16.0),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          FloatingActionButton(
-                            heroTag: 0,
-                            backgroundColor: inActive,
-                            foregroundColor: primary,
-                            child: Icon(Icons.keyboard_arrow_left),
-                            onPressed: () {
-                              Navigator.pushReplacementNamed(
-                                  context, '/delivery');
-                            },
-                          ),
-                          SizedBox(width: 12.0),
-                          FloatingActionButton(
-                            heroTag: 1,
-                            backgroundColor: primary,
-                            child: Icon(Icons.keyboard_arrow_right),
-                            onPressed: () {
-                              _next(context);
-                            },
-                          ),
-                        ],
-                      ),
                     ],
                   ),
                 ),
@@ -115,6 +83,35 @@ class _DeliveryServicesState extends State<DeliveryServices> {
             ),
           )
         ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            FloatingActionButton(
+              backgroundColor: inActive,
+              foregroundColor: primary,
+              heroTag: "btn",
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/delivery');
+              },
+              child: Icon(Icons.keyboard_arrow_left),
+            ),
+            SizedBox(
+              width: 40,
+            ),
+            FloatingActionButton(
+              backgroundColor: primary,
+              heroTag: "btn2",
+              onPressed: () {
+                _next(context);
+              },
+              child: Icon(Icons.keyboard_arrow_right),
+            )
+          ],
+        ),
       ),
     );
   }

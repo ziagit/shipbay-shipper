@@ -22,8 +22,16 @@ class _CardDetailsState extends State<CardDetails> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: bgColor,
-        iconTheme: IconThemeData(color: primary),
         elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+          ),
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, '/home');
+          },
+        ),
         actions: [
           Builder(
             builder: (context) => IconButton(
@@ -39,7 +47,7 @@ class _CardDetailsState extends State<CardDetails> {
       ),
       drawer: MainMenu(),
       body: Padding(
-        padding: const EdgeInsets.all(30.0),
+        padding: const EdgeInsets.all(20.0),
         child: ListView(
           children: [
             Padding(
@@ -107,6 +115,7 @@ class _CardDetailsState extends State<CardDetails> {
                             children: [
                               _processing
                                   ? Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
                                         Text("Processing"),
                                         JumpingDotsProgressIndicator(
@@ -125,12 +134,14 @@ class _CardDetailsState extends State<CardDetails> {
                         )
                       : Align(
                           alignment: Alignment.centerRight,
-                          child: FlatButton(
-                            child: Text("Process order"),
-                            onPressed: () {
-                              Navigator.pushReplacementNamed(
-                                  context, '/payment-details');
-                            },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text("Completing"),
+                              JumpingDotsProgressIndicator(
+                                fontSize: 20.0,
+                              ),
+                            ],
                           ),
                         )
                 ],
@@ -160,24 +171,26 @@ class _CardDetailsState extends State<CardDetails> {
   @override
   void initState() {
     super.initState();
+    _init();
     Future.delayed(Duration.zero, () {
       if (ModalRoute.of(context).settings.arguments != null) {
         _paymentMessage = ModalRoute.of(context).settings.arguments;
       }
     });
-    _init();
   }
 
   _init() async {
     var token = await store.read('token');
-    var data = await getCard(token);
+    var response = await getCard(token);
     setState(() {
-      card = data;
+      card = response;
     });
   }
 
   _charge() async {
-    _processing = true;
+    setState(() {
+      _processing = true;
+    });
     var token = await store.read('token');
     var carrier = await store.read('carrier');
     var billing = await store.read('billing');
@@ -190,13 +203,12 @@ class _CardDetailsState extends State<CardDetails> {
         'orderId': response['id']
       });
       setState(() {
+        _processing = false;
         _paymentMessage = response['message'];
         _successColor = Colors.green;
         _paymentStatus = response['status'];
       });
-      _processing = false;
-      print("cussssssssssxssssssssssss.....");
-      print(response);
+      Navigator.pushReplacementNamed(context, '/payment-details');
     } else {
       Navigator.pushReplacementNamed(context, '/pickup');
     }

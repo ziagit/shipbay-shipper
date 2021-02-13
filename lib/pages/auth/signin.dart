@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shipbay/pages/store/store.dart';
 import 'package:shipbay/services/api.dart';
@@ -15,37 +17,36 @@ class _SigninState extends State<Signin> {
   TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
   final _formKey = GlobalKey<FormState>();
+  var _pendingOrder;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        backgroundColor: Color(0xF8FAF8),
         elevation: 0.0,
+        backgroundColor: bgColor,
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/carriers');
-          },
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pushReplacementNamed(context, '/home'),
         ),
       ),
-
       body: ListView(
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.all(30.0),
             child: Column(
               children: <Widget>[
-                SizedBox(
-                  width: 150.0,
-                  child: Image(
-                    image: AssetImage('assets/images/coffeequery.png'),
+                Container(
+                  width: 80.0,
+                  height: 80.0,
+                  child: CircleAvatar(
+                    radius: 25.0,
+                    child: Icon(Icons.person, color: Colors.white),
+                    backgroundColor: primary,
                   ),
+                  decoration: BoxDecoration(),
                 ),
-                SizedBox(height: 24.0),
+                SizedBox(height: 40.0),
                 Text(
                   "Login",
                   style: TextStyle(fontSize: 24.0),
@@ -98,7 +99,7 @@ class _SigninState extends State<Signin> {
                           width: double.infinity,
                           height: 46.0,
                           child: RaisedButton(
-                            color: Colors.orange[900],
+                            color: primary,
                             child: Text(
                               "Login",
                               style: TextStyle(
@@ -124,16 +125,17 @@ class _SigninState extends State<Signin> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             Visibility(
-                              visible: true,
-                              child: FlatButton(
-                                onPressed: () {
-                                  Navigator.pushReplacementNamed(
-                                      context, '/payment-details');
-                                },
-                                child: Text("Continue as guest",
-                                    style: TextStyle(fontSize: 12.0)),
-                              ),
-                            ),
+                                visible: true,
+                                child: _pendingOrder != null
+                                    ? FlatButton(
+                                        onPressed: () {
+                                          Navigator.pushReplacementNamed(
+                                              context, '/payment-details');
+                                        },
+                                        child: Text("Continue as guest",
+                                            style: TextStyle(fontSize: 12.0)),
+                                      )
+                                    : Container()),
                             FlatButton(
                               child: Text(
                                 "Register",
@@ -160,50 +162,41 @@ class _SigninState extends State<Signin> {
 
   @override
   void initState() {
-    _pendingOrder();
+    _order();
     super.initState();
   }
 
-  _pendingOrder() async {
-    var data = store.read('pickup');
-    if (data != null) {
-      //order is pending
-    }
+  _order() async {
+    var data = await store.read('additional-details');
+    setState(() {
+      _pendingOrder = data;
+    });
   }
 
-  Future<Map<String, dynamic>> _login(context) async {
-    var additionalDetails = store.read('additional-details');
+  _login(context) async {
     setState(() {
       _isLoading = true;
     });
-    Login instance =
-        Login(_emailController.text, _passwordController.text, context);
-    await instance.login().then(
-          (response) => {
-            if (response['token'] != null)
-              {
-                if (additionalDetails != null)
-                  {
-                    _isLoading = false,
-                    store.save('token', response['token']),
-                    Navigator.pushReplacementNamed(context, '/payment-details'),
-                  }
-                else
-                  {
-                    _isLoading = false,
-                    store.save('token', response['token']),
-                    Navigator.pushReplacementNamed(context, '/home'),
-                  }
-              }
-            else
-              {
-                setState(() {
-                  _isLoading = false;
-                }),
-                _scaffoldKey.currentState
-                    .showSnackBar(SnackBar(content: Text(response['message']))),
-              }
-          },
-        );
+
+    var response = await login(_emailController.text, _passwordController.text);
+    var jsonData = jsonDecode(response.body);
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      if (_pendingOrder != null) {
+        _isLoading = false;
+        store.save('token', jsonData);
+        Navigator.pushReplacementNamed(context, '/payment-details');
+      } else {
+        _isLoading = false;
+        store.save('token', jsonData);
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+    } else {
+      setState(() {
+        _isLoading = false;
+      });
+      _scaffoldKey.currentState
+          .showSnackBar(SnackBar(content: Text(jsonData['message'])));
+    }
   }
 }

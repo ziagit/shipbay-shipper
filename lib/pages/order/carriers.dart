@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:shipbay/models/carrier_model.dart';
+import 'package:shipbay/pages/shared/custom_appbar.dart';
+import 'package:shipbay/pages/shared/main_menu.dart';
 import 'package:shipbay/pages/shared/progress.dart';
 import 'package:shipbay/pages/store/store.dart';
 import 'dart:convert';
 import 'package:http/http.dart';
+import 'package:shipbay/pages/tracking/tracking.dart';
 import 'package:shipbay/services/settings.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:progress_indicators/progress_indicators.dart';
+import 'package:shipbay/services/api.dart';
 
 class Carriers extends StatefulWidget {
   @override
@@ -26,30 +30,22 @@ class _CarriersState extends State<Carriers> {
   bool _isRTLMode = false;
   bool _isVertical = false;
   IconData _selectedIcon;
-
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _isLoading = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: bgColor,
-        elevation: 0.0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/additional-details');
-          },
-        ),
-      ),
+      key: _scaffoldKey,
+      appBar: CustomAppBar(''),
+      drawer: MainMenu(),
+      endDrawer: Tracking(),
       body: ListView(
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
               children: <Widget>[
-                Container(child: Progress(progress: 85.0)),
+                Container(child: Progress(progress: 75.0)),
                 Text(
                   "Select a carrier",
                   style: TextStyle(fontSize: 22.0, height: 2.0),
@@ -184,13 +180,31 @@ class _CarriersState extends State<Carriers> {
           )
         ],
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            FloatingActionButton(
+              backgroundColor: inActive,
+              foregroundColor: primary,
+              heroTag: "btn2",
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/pickup');
+              },
+              child: Icon(Icons.edit),
+            )
+          ],
+        ),
+      ),
     );
   }
 
   @override
   void initState() {
-    _init();
     super.initState();
+    _init();
   }
 
   Decoration _customStyle(context) {
@@ -265,7 +279,6 @@ class _CarriersState extends State<Carriers> {
     if (itemConditions['Temperature sensitive']) {
       order['myItem']['conditions'].add('tm');
     }
-
     order['myItem']['maxTemp'] =
         itemTemperature == null ? null : itemTemperature['max_temp'];
     order['myItem']['minTemp'] =
@@ -274,37 +287,39 @@ class _CarriersState extends State<Carriers> {
 
   Future<List<Carrier>> _get() async {
     try {
-      Response response = await post(
-        "http://35.184.16.20/api/carriers-rate",
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(<String, Object>{
+      var response = await carrierList(
+        jsonEncode(<String, Object>{
           "src": order['src'],
           "pickDate": order['pickDate'],
           "des": order['des'],
           "myItem": order['myItem'],
         }),
       );
-
       var jsonData = jsonDecode(response.body);
-      List<Carrier> carriers = [];
-      for (int i = 0; i < jsonData.length; i++) {
-        Carrier carrier = Carrier(
-            jsonData[i]['id'],
-            jsonData[i]['first_name'],
-            jsonData[i]['last_name'],
-            jsonData[i]['phone'],
-            jsonData[i]['price'].toDouble(),
-            jsonData[i]['company'],
-            jsonData[i]['detail'],
-            jsonData[i]['rates'].toDouble(),
-            jsonData[i]['website'],
-            jsonData[i]['logo']);
+      if (response.statusCode != 200 || jsonData.length == 0) {
+        _scaffoldKey.currentState.showSnackBar(SnackBar(
+          content: Text(
+              'Something is wrong, please check the Source or Destination!'),
+        ));
+      } else {
+        List<Carrier> carriers = [];
+        for (int i = 0; i < jsonData.length; i++) {
+          Carrier carrier = Carrier(
+              jsonData[i]['id'],
+              jsonData[i]['first_name'],
+              jsonData[i]['last_name'],
+              jsonData[i]['phone'],
+              jsonData[i]['price'].toDouble(),
+              jsonData[i]['company'],
+              jsonData[i]['detail'],
+              jsonData[i]['rates'].toDouble(),
+              jsonData[i]['website'],
+              jsonData[i]['logo']);
 
-        carriers.add(carrier);
+          carriers.add(carrier);
+        }
+        return carriers;
       }
-      return carriers;
     } catch (err) {
       print("error: ${err.toString()}");
     }
@@ -314,7 +329,6 @@ class _CarriersState extends State<Carriers> {
     store.save('carrier', carrier);
     String token = await store.read('token');
     if (token != null) {
-      print(token);
       Navigator.pushReplacementNamed(context, '/payment-details');
     } else {
       Navigator.pushReplacementNamed(context, '/signin');

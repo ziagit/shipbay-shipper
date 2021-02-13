@@ -11,6 +11,7 @@ class Signup extends StatefulWidget {
 }
 
 class _SignupState extends State<Signup> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   bool _isLoading = false;
   Store store = Store();
   TextEditingController _nameController = TextEditingController();
@@ -22,17 +23,13 @@ class _SignupState extends State<Signup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
-        backgroundColor: Color(0xF8FAF8),
+        backgroundColor: bgColor,
         elevation: 0.0,
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/carriers');
-          },
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pushReplacementNamed(context, '/signin'),
         ),
       ),
 
@@ -42,13 +39,17 @@ class _SignupState extends State<Signup> {
             padding: const EdgeInsets.all(30.0),
             child: Column(
               children: <Widget>[
-                SizedBox(
-                  width: 150.0,
-                  child: Image(
-                    image: AssetImage('assets/images/coffeequery.png'),
+                Container(
+                  width: 80.0,
+                  height: 80.0,
+                  child: CircleAvatar(
+                    radius: 25.0,
+                    child: Icon(Icons.person_add, color: Colors.white),
+                    backgroundColor: primary,
                   ),
+                  decoration: BoxDecoration(),
                 ),
-                SizedBox(height: 24.0),
+                SizedBox(height: 40.0),
                 Text(
                   "Register",
                   style: TextStyle(fontSize: 24.0),
@@ -103,7 +104,7 @@ class _SignupState extends State<Signup> {
                           width: double.infinity,
                           height: 46.0,
                           child: RaisedButton(
-                            color: Colors.orange[900],
+                            color: primary,
                             child: Text(
                               "Signup",
                               style: TextStyle(
@@ -158,27 +159,35 @@ class _SignupState extends State<Signup> {
   }
 
   Future<Map<String, dynamic>> _register(context) async {
+    if (_passwordController.text != _confirmPasswordController.text) {
+      _scaffoldKey.currentState
+          .showSnackBar(SnackBar(content: Text("Passwords not matchs!")));
+      return null;
+    }
     setState(() {
       _isLoading = true;
     });
-    Register instance = Register(
-        _nameController.text,
-        _emailController.text,
-        _passwordController.text,
-        _confirmPasswordController.text,
-        _role,
-        context);
-    instance.register().then(
-          (response) => {
-            if (response['token'] != null)
-              {
-                store.save('token', response['token']),
-                setState(() {
-                  _isLoading = false;
-                }),
-                Navigator.pushReplacementNamed(context, '/welcome'),
-              }
-          },
-        );
+    var response = await register(jsonEncode(<String, dynamic>{
+      "name": _nameController.text,
+      "email": _emailController.text,
+      "password": _passwordController.text,
+      "password_confirmation": _confirmPasswordController.text,
+      "type": _role,
+    }));
+    var jsonData = jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      store.save('token', jsonData);
+      setState(() {
+        _isLoading = false;
+      });
+      Navigator.pushReplacementNamed(context, '/welcome');
+    } else {
+      print(jsonData['error']['email']);
+      setState(() {
+        _isLoading = false;
+      });
+      _scaffoldKey.currentState
+          .showSnackBar(SnackBar(content: Text(jsonData.toString())));
+    }
   }
 }

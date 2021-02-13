@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shipbay/models/pickup_date_model.dart';
+import 'package:shipbay/pages/shared/custom_appbar.dart';
+import 'package:shipbay/pages/shared/main_menu.dart';
 import 'package:shipbay/pages/shared/progress.dart';
 import 'package:shipbay/pages/store/store.dart';
+import 'package:shipbay/pages/tracking/tracking.dart';
 import 'package:shipbay/services/settings.dart';
 
 class PickupDate extends StatefulWidget {
@@ -25,26 +28,16 @@ class _PickupDateState extends State<PickupDate> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: bgColor,
-        elevation: 0.0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/pickup-services');
-          },
-        ),
-      ),
+      appBar: CustomAppBar(''),
+      drawer: MainMenu(),
+      endDrawer: Tracking(),
       body: ListView(
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
               children: <Widget>[
-                Container(child: Progress(progress: 25.0)),
+                Container(child: Progress(progress: 28.0)),
                 Container(
                   child: Form(
                     key: _formKey,
@@ -101,33 +94,6 @@ class _PickupDateState extends State<PickupDate> {
                                 InputDecoration(hintText: 'Select time'),
                           ),
                         ),
-                        SizedBox(height: 16.0),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            FloatingActionButton(
-                              heroTag: 0,
-                              backgroundColor: inActive,
-                              foregroundColor: primary,
-                              child: Icon(Icons.keyboard_arrow_left),
-                              onPressed: () {
-                                Navigator.pushReplacementNamed(
-                                    context, '/pickup-services');
-                              },
-                            ),
-                            SizedBox(width: 16.0),
-                            FloatingActionButton(
-                              heroTag: 1,
-                              backgroundColor: primary,
-                              child: Icon(Icons.keyboard_arrow_right),
-                              onPressed: () {
-                                if (_formKey.currentState.validate()) {
-                                  _next(context);
-                                }
-                              },
-                            ),
-                          ],
-                        ),
                       ],
                     ),
                   ),
@@ -136,6 +102,37 @@ class _PickupDateState extends State<PickupDate> {
             ),
           )
         ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            FloatingActionButton(
+              backgroundColor: inActive,
+              foregroundColor: primary,
+              heroTag: "btn",
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/pickup-services');
+              },
+              child: Icon(Icons.keyboard_arrow_left),
+            ),
+            SizedBox(
+              width: 40,
+            ),
+            FloatingActionButton(
+              backgroundColor: primary,
+              heroTag: "btn2",
+              onPressed: () {
+                if (_formKey.currentState.validate()) {
+                  _next(context);
+                }
+              },
+              child: Icon(Icons.keyboard_arrow_right),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -150,8 +147,8 @@ class _PickupDateState extends State<PickupDate> {
     DateTime _datePicker = await showDatePicker(
         context: context,
         initialDate: _date,
-        firstDate: DateTime(2020),
-        lastDate: DateTime(2050),
+        firstDate: _date.subtract(Duration(days: 0)),
+        lastDate: DateTime(2100),
         builder: (BuildContext context, Widget child) {
           return Theme(
             data: ThemeData(

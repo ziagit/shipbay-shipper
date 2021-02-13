@@ -18,8 +18,16 @@ class _AcountState extends State<Acount> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: bgColor,
-        iconTheme: IconThemeData(color: primary),
         elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+          ),
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, '/home');
+          },
+        ),
         actions: [
           Builder(
             builder: (context) => IconButton(
@@ -57,9 +65,8 @@ class _AcountState extends State<Acount> {
     Store store = Store();
     String _token = await store.read('token');
     try {
-      var response =
-          await http.get('http://192.168.2.14:8000/api/auth/me', headers: {
-        'Authorization': 'Bearer ${_token}',
+      var response = await http.get('$baseUrl/auth/me', headers: {
+        'Authorization': 'Bearer $_token',
         'Content-Type': 'application/x-www-form-urlencoded'
       });
       var data = jsonDecode(response.body);

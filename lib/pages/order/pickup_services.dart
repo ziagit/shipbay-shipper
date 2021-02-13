@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:shipbay/pages/shared/custom_appbar.dart';
+import 'package:shipbay/pages/shared/main_menu.dart';
 import 'package:shipbay/pages/shared/progress.dart';
 import 'package:shipbay/pages/store/store.dart';
+import 'package:shipbay/pages/tracking/tracking.dart';
 import 'package:shipbay/services/settings.dart';
+import 'package:shipbay/services/api.dart';
 
 class PickupServices extends StatefulWidget {
   @override
@@ -13,29 +17,20 @@ class _PickupServicesState extends State<PickupServices> {
     'Inside pickup': false,
     'Tailgate': false,
   };
+  List services;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xF8FAF8),
-        elevation: 0.0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/pickup');
-          },
-        ),
-      ),
+      appBar: CustomAppBar(''),
+      drawer: MainMenu(),
+      endDrawer: Tracking(),
       body: ListView(
         children: <Widget>[
           Container(
             padding: const EdgeInsets.all(20.0),
             child: Column(
               children: <Widget>[
-                SizedBox(child: Progress(progress: 12.0)),
+                SizedBox(child: Progress(progress: 18.0)),
                 Container(
                   child: Column(
                     children: <Widget>[
@@ -63,31 +58,6 @@ class _PickupServicesState extends State<PickupServices> {
                           );
                         }).toList(),
                       ),
-                      SizedBox(height: 16.0),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          FloatingActionButton(
-                            heroTag: 0,
-                            backgroundColor: inActive,
-                            foregroundColor: primary,
-                            child: Icon(Icons.keyboard_arrow_left),
-                            onPressed: () {
-                              Navigator.pushReplacementNamed(
-                                  context, '/pickup');
-                            },
-                          ),
-                          SizedBox(width: 16.0),
-                          FloatingActionButton(
-                            heroTag: 1,
-                            backgroundColor: primary,
-                            child: Icon(Icons.keyboard_arrow_right),
-                            onPressed: () {
-                              _next(context);
-                            },
-                          ),
-                        ],
-                      ),
                     ],
                   ),
                 ),
@@ -96,12 +66,42 @@ class _PickupServicesState extends State<PickupServices> {
           )
         ],
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            FloatingActionButton(
+              backgroundColor: inActive,
+              foregroundColor: primary,
+              heroTag: "btn",
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/pickup');
+              },
+              child: Icon(Icons.keyboard_arrow_left),
+            ),
+            SizedBox(
+              width: 40,
+            ),
+            FloatingActionButton(
+              backgroundColor: primary,
+              heroTag: "btn2",
+              onPressed: () {
+                _next(context);
+              },
+              child: Icon(Icons.keyboard_arrow_right),
+            )
+          ],
+        ),
+      ),
     );
   }
 
   @override
   void initState() {
     super.initState();
+    _getPickServices();
     _init();
   }
 
@@ -120,5 +120,13 @@ class _PickupServicesState extends State<PickupServices> {
         _services['Tailgate'] = data['Tailgate'];
       });
     }
+  }
+
+  _getPickServices() async {
+    List response = await getPickServices();
+    /* setState(() {
+      print(",,,,,,,,,,,,,,,");
+      print(response);
+    }); */
   }
 }

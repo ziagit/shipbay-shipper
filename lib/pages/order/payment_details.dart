@@ -1,7 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:progress_indicators/progress_indicators.dart';
+import 'package:shipbay/pages/shared/custom_appbar.dart';
+import 'package:shipbay/pages/shared/main_menu.dart';
 import 'package:shipbay/pages/shared/progress.dart';
 import 'package:shipbay/pages/store/store.dart';
+import 'package:shipbay/pages/tracking/tracking.dart';
 import 'package:shipbay/services/settings.dart';
 import 'package:stripe_payment/stripe_payment.dart';
 import 'package:shipbay/services/api.dart';
@@ -12,7 +18,7 @@ class PaymentDetails extends StatefulWidget {
 }
 
 class _PaymentDetailsState extends State<PaymentDetails> {
-  double _progress = 85.0;
+  double _progress = 95.0;
   bool _loading = false;
   String _paymentMessage = "Add your card information";
   Color _successColor = Colors.black;
@@ -23,10 +29,9 @@ class _PaymentDetailsState extends State<PaymentDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: bgColor,
-        elevation: 0.0,
-      ),
+      appBar: CustomAppBar(''),
+      drawer: MainMenu(),
+      endDrawer: Tracking(),
       body: ListView(
         children: [
           Padding(
@@ -92,6 +97,18 @@ class _PaymentDetailsState extends State<PaymentDetails> {
                                     context, '/confirm');
                               },
                             ),
+                      SizedBox(height: 12.0),
+                      _loading
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text("Loading"),
+                                JumpingDotsProgressIndicator(
+                                  fontSize: 20.0,
+                                ),
+                              ],
+                            )
+                          : Container()
                     ],
                   ),
                 ),
@@ -128,11 +145,16 @@ class _PaymentDetailsState extends State<PaymentDetails> {
         ),
       ),
     ).then((Object value) {
+      setState(() {
+        _loading = true;
+      });
       _charge(value);
     });
   }
 
   _charge(card) async {
+    print("card token ..........");
+    print(card);
     var token = await store.read('token');
     var carrier = await store.read('carrier');
     if (token != null) {
@@ -140,9 +162,6 @@ class _PaymentDetailsState extends State<PaymentDetails> {
     } else {
       _chargeNow(carrier, card);
     }
-    setState(() {
-      _loading = true;
-    });
   }
 
   _init() async {
@@ -159,11 +178,17 @@ class _PaymentDetailsState extends State<PaymentDetails> {
 
   _addCard(carrier, card, token) async {
     var jsonData = await addCard(carrier, card, token);
+    if (jsonData["error"] != null) {
+      throw HttpException(jsonData["error"]["message"]);
+    }
     store.save('billing', {
       'status': jsonData['status'],
       'email': jsonData['email'],
       'message': jsonData['message'],
       'orderId': jsonData['id']
+    });
+    setState(() {
+      _loading = false;
     });
     Navigator.pushReplacementNamed(context, '/card',
         arguments: jsonData['message']);
@@ -171,6 +196,9 @@ class _PaymentDetailsState extends State<PaymentDetails> {
 
   _chargeNow(carrier, data) async {
     var jsonData = await chargeNow(carrier, data);
+    if (jsonData["error"] != null) {
+      throw HttpException(jsonData["error"]["message"]);
+    }
     store.save('billing', {
       'status': jsonData['status'],
       'email': jsonData['email'],
@@ -182,6 +210,7 @@ class _PaymentDetailsState extends State<PaymentDetails> {
       _paymentMessage = jsonData['message'];
       _successColor = Colors.green;
       _paymentStatus = jsonData['status'];
+      _loading = false;
     });
   }
 }

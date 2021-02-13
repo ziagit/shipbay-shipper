@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shipbay/models/accessory.dart';
 import 'package:shipbay/models/delivery_address_model.dart';
+import 'package:shipbay/pages/shared/custom_appbar.dart';
 import 'package:shipbay/pages/shared/google_address.dart';
+import 'package:shipbay/pages/shared/main_menu.dart';
 import 'package:shipbay/pages/shared/progress.dart';
 import 'package:shipbay/pages/store/store.dart';
+import 'package:shipbay/pages/tracking/tracking.dart';
 import 'package:shipbay/services/api.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -17,6 +20,7 @@ class Delivery extends StatefulWidget {
 class _DeliveryState extends State<Delivery> {
   TextEditingController _addressController = TextEditingController();
   String groupValue = 'bs';
+  List types;
   String country;
   String state;
   String city;
@@ -25,30 +29,22 @@ class _DeliveryState extends State<Delivery> {
   String street_number;
   String formatted_address;
   final _formKey = GlobalKey<FormState>();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xF8FAF8),
-        elevation: 0.0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/pickup-date');
-          },
-        ),
-      ),
+      key: _scaffoldKey,
+      appBar: CustomAppBar(''),
+      drawer: MainMenu(),
+      endDrawer: Tracking(),
       body: ListView(
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
               children: <Widget>[
-                Container(child: Progress(progress: 37.0)),
+                Container(child: Progress(progress: 36.0)),
                 Container(
                   child: Form(
                     key: _formKey,
@@ -73,84 +69,33 @@ class _DeliveryState extends State<Delivery> {
                           },
                         ),
                         SizedBox(height: 16.0),
-                        Row(
-                          children: <Widget>[
-                            Radio(
-                                activeColor: primary,
-                                value: "bs",
-                                groupValue: groupValue,
-                                onChanged: (val) {
-                                  setState(() {
-                                    groupValue = val;
-                                  });
-                                }),
-                            Text(
-                              "Business",
-                              style: TextStyle(fontSize: 11.0),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Radio(
-                                activeColor: primary,
-                                value: "rs",
-                                groupValue: groupValue,
-                                onChanged: (val) {
-                                  setState(() {
-                                    groupValue = val;
-                                  });
-                                }),
-                            Text(
-                              "Residential",
-                              style: TextStyle(fontSize: 11.0),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Radio(
-                                activeColor: primary,
-                                value: "sp",
-                                groupValue: groupValue,
-                                onChanged: (val) {
-                                  setState(() {
-                                    groupValue = val;
-                                  });
-                                }),
-                            Text(
-                              "Special location",
-                              style: TextStyle(fontSize: 11.0),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 24.0),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            FloatingActionButton(
-                              heroTag: 0,
-                              backgroundColor: Colors.orange[50],
-                              foregroundColor: Colors.orange[900],
-                              child: Icon(Icons.keyboard_arrow_left),
-                              onPressed: () {
-                                Navigator.pushReplacementNamed(
-                                    context, '/pickup-date');
-                              },
-                            ),
-                            SizedBox(width: 16.0),
-                            FloatingActionButton(
-                              heroTag: 1,
-                              backgroundColor: Colors.orange[900],
-                              child: Icon(Icons.keyboard_arrow_right),
-                              onPressed: () {
-                                if (_formKey.currentState.validate()) {
-                                  _next(context);
-                                }
-                              },
-                            ),
-                          ],
-                        ),
+                        types == null
+                            ? Container(
+                                child: Text("Loading..."),
+                              )
+                            : ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: types.length,
+                                itemBuilder: (context, index) {
+                                  return Row(
+                                    children: <Widget>[
+                                      Radio(
+                                          activeColor: primary,
+                                          value: "${types[index]['code']}",
+                                          groupValue: groupValue,
+                                          onChanged: (val) {
+                                            setState(() {
+                                              groupValue = val;
+                                            });
+                                          }),
+                                      Text(
+                                        "${types[index]['name']}",
+                                        style: TextStyle(fontSize: 11.0),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
                       ],
                     ),
                   ),
@@ -160,6 +105,37 @@ class _DeliveryState extends State<Delivery> {
           )
         ],
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            FloatingActionButton(
+              backgroundColor: inActive,
+              foregroundColor: primary,
+              heroTag: "btn",
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/pickup-date');
+              },
+              child: Icon(Icons.keyboard_arrow_left),
+            ),
+            SizedBox(
+              width: 40,
+            ),
+            FloatingActionButton(
+              backgroundColor: primary,
+              heroTag: "btn2",
+              onPressed: () {
+                if (_formKey.currentState.validate()) {
+                  _next(context);
+                }
+              },
+              child: Icon(Icons.keyboard_arrow_right),
+            )
+          ],
+        ),
+      ),
     );
   }
 
@@ -167,6 +143,7 @@ class _DeliveryState extends State<Delivery> {
   void initState() {
     super.initState();
     _init();
+    _getLocationType();
   }
 
   _openDialog(context, keyword) {
@@ -203,8 +180,17 @@ class _DeliveryState extends State<Delivery> {
     deliveryAddressModel.street_number = street_number;
     deliveryAddressModel.formatted_address = formatted_address;
     deliveryAddressModel.location_type = groupValue;
-    await store.save('delivery', deliveryAddressModel);
-    Navigator.pushReplacementNamed(context, '/delivery-services');
+    if (deliveryAddressModel.country == null ||
+        deliveryAddressModel.state == null ||
+        deliveryAddressModel.city == null ||
+        deliveryAddressModel.zip == null) {
+      _scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: Text('Please select a valid address!'),
+      ));
+    } else {
+      await store.save('delivery', deliveryAddressModel);
+      Navigator.pushReplacementNamed(context, '/delivery-services');
+    }
   }
 
   _init() async {
@@ -256,11 +242,6 @@ class _DeliveryState extends State<Delivery> {
     formatted_address = data['result']['formatted_address'];
   }
 
-  Future<List<Accessory>> _getAccessories() async {
-    Accessories instance = Accessories("location-type");
-    return instance.getData();
-  }
-
   selected(selectedAddress) {
     if (selectedAddress.description != null) {
       setState(() {
@@ -268,5 +249,12 @@ class _DeliveryState extends State<Delivery> {
         addressDetails(selectedAddress.place_id);
       });
     }
+  }
+
+  _getLocationType() async {
+    List response = await getLocationType();
+    setState(() {
+      types = response;
+    });
   }
 }

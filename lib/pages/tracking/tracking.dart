@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shipbay/services/settings.dart';
 
 class Tracking extends StatefulWidget {
   @override
@@ -9,7 +10,7 @@ class _TrackingState extends State<Tracking> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.green,
+      backgroundColor: primary,
       body: SafeArea(
           child: Stack(
         children: <Widget>[
@@ -18,13 +19,13 @@ class _TrackingState extends State<Tracking> {
             right: 0,
             child: IconButton(
               onPressed: () {
-                Navigator.pushReplacementNamed(context, '/home');
+                Navigator.pushReplacementNamed(context, '/pickup');
               },
               icon: Icon(Icons.arrow_forward),
             ),
           ),
           Center(
-            child: Text("Load the Map here"),
+            child: Text("Load the data here"),
           )
         ],
       )),

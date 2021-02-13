@@ -51,7 +51,14 @@ class _GoogleAddressState extends State<GoogleAddress> {
                   physics: ClampingScrollPhysics(),
                 ),
               )
-            : Container(),
+            : Container(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation(primary),
+                  ),
+                ),
+              ),
       ],
     );
   }

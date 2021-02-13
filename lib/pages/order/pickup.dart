@@ -3,14 +3,15 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:shipbay/models/accessory.dart';
 import 'package:shipbay/models/pickup_address_model.dart';
+import 'package:shipbay/pages/shared/custom_appbar.dart';
 import 'package:shipbay/pages/shared/google_address.dart';
+import 'package:shipbay/pages/shared/main_menu.dart';
 import 'package:shipbay/pages/shared/progress.dart';
 import 'package:shipbay/pages/store/store.dart';
+import 'package:shipbay/pages/tracking/tracking.dart';
 import 'package:shipbay/services/settings.dart';
 import 'package:shipbay/services/api.dart';
-import 'dart:async';
 
 class Pickup extends StatefulWidget {
   @override
@@ -19,8 +20,9 @@ class Pickup extends StatefulWidget {
 
 class _PickupState extends State<Pickup> {
   Store store = Store();
-  TextEditingController _addressController = TextEditingController();
   String groupValue = 'bs';
+  List types;
+  TextEditingController _addressController = TextEditingController();
 
   String country;
   String state;
@@ -37,133 +39,113 @@ class _PickupState extends State<Pickup> {
     SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(statusBarColor: primary));
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: bgColor,
-        elevation: 0.0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, '/home');
-          },
-        ),
-      ),
+      key: _scaffoldKey,
+      appBar: CustomAppBar(''),
+      drawer: MainMenu(),
+      endDrawer: Tracking(),
       body: ListView(
         children: <Widget>[
           Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                children: <Widget>[
-                  SizedBox(child: Progress(progress: 0.0)),
-                  Form(
-                    key: _formKey,
-                    child: Column(
-                      children: <Widget>[
-                        Text(
-                          "Pickup address",
-                          style: TextStyle(fontSize: 22.0, height: 2.0),
-                        ),
-                        SizedBox(height: 16.0),
-                        TextFormField(
-                          controller: _addressController,
-                          decoration: InputDecoration(hintText: 'Postal code'),
-                          validator: (value) {
-                            if (value.isEmpty) {
-                              return 'Please enter a valid address';
-                            }
-                            return null;
-                          },
-                          onChanged: (keyword) {
-                            _openDialog(context, keyword);
-                          },
-                        ),
-                        SizedBox(height: 16.0),
-                        Row(
-                          children: <Widget>[
-                            Radio(
-                                activeColor: primary,
-                                value: "bs",
-                                groupValue: groupValue,
-                                onChanged: (val) {
-                                  setState(() {
-                                    groupValue = val;
-                                  });
-                                }),
-                            Text(
-                              "Business",
-                              style: TextStyle(fontSize: 11.0),
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: <Widget>[
+                SizedBox(child: Progress(progress: 0.0)),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: <Widget>[
+                      Text(
+                        "Pickup address",
+                        style: TextStyle(fontSize: 22.0, height: 2.0),
+                      ),
+                      SizedBox(height: 16.0),
+                      TextFormField(
+                        controller: _addressController,
+                        decoration: InputDecoration(hintText: 'Postal code'),
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Please enter a valid address';
+                          }
+                          return null;
+                        },
+                        onChanged: (keyword) {
+                          _openDialog(context, keyword);
+                        },
+                      ),
+                      SizedBox(height: 16.0),
+                      types == null
+                          ? Container(
+                              child: Text("Loading..."),
+                            )
+                          : ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: types.length,
+                              itemBuilder: (context, index) {
+                                return Row(
+                                  children: <Widget>[
+                                    Radio(
+                                        activeColor: primary,
+                                        value: "${types[index]['code']}",
+                                        groupValue: groupValue,
+                                        onChanged: (val) {
+                                          setState(() {
+                                            groupValue = val;
+                                          });
+                                        }),
+                                    Text(
+                                      "${types[index]['name']}",
+                                      style: TextStyle(fontSize: 11.0),
+                                    ),
+                                  ],
+                                );
+                              },
                             ),
-                          ],
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Radio(
-                                activeColor: primary,
-                                value: "rs",
-                                groupValue: groupValue,
-                                onChanged: (val) {
-                                  setState(() {
-                                    groupValue = val;
-                                  });
-                                }),
-                            Text(
-                              "Residential",
-                              style: TextStyle(fontSize: 11.0),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Radio(
-                                activeColor: primary,
-                                value: "sp",
-                                groupValue: groupValue,
-                                onChanged: (val) {
-                                  setState(() {
-                                    groupValue = val;
-                                  });
-                                }),
-                            Text(
-                              "Special location",
-                              style: TextStyle(fontSize: 11.0),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 16.0),
-                        FloatingActionButton(
-                          heroTag: 1,
-                          backgroundColor: primary,
-                          child: Icon(Icons.keyboard_arrow_right),
-                          onPressed: () {
-                            if (_formKey.currentState.validate()) {
-                              _next(context);
-                            }
-                          },
-                        ),
-                      ],
-                    ),
+                    ],
                   ),
-                ],
-              ))
+                ),
+              ],
+            ),
+          )
         ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            FloatingActionButton(
+              backgroundColor: primary,
+              heroTag: "btn2",
+              onPressed: () {
+                if (_formKey.currentState.validate()) {
+                  _next(context);
+                }
+              },
+              child: Icon(Icons.keyboard_arrow_right),
+            )
+          ],
+        ),
       ),
     );
   }
 
   @override
   void initState() {
-    _init();
     super.initState();
+    _getLocationType();
+    _init();
   }
 
-  _openDialog(context, keyword) {
+  void _openDialog(context, keyword) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10.0))),
+          borderRadius: BorderRadius.all(
+            Radius.circular(10.0),
+          ),
+        ),
         content: Builder(
           builder: (context) {
             var height = MediaQuery.of(context).size.height;
@@ -177,7 +159,10 @@ class _PickupState extends State<Pickup> {
         ),
       ),
     ).then(
-      (value) {},
+      (value) {
+        print('data back grom dialog');
+        print(value);
+      },
     );
   }
 
@@ -191,8 +176,17 @@ class _PickupState extends State<Pickup> {
     pickupAddressModel.street_number = street_number;
     pickupAddressModel.formatted_address = formatted_address;
     pickupAddressModel.location_type = groupValue;
-    await store.save('pickup', pickupAddressModel);
-    Navigator.pushReplacementNamed(context, '/pickup-services');
+    if (pickupAddressModel.country == null ||
+        pickupAddressModel.state == null ||
+        pickupAddressModel.city == null ||
+        pickupAddressModel.zip == null) {
+      _scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: Text('Please select a valid address!'),
+      ));
+    } else {
+      await store.save('pickup', pickupAddressModel);
+      Navigator.pushReplacementNamed(context, '/pickup-services');
+    }
   }
 
   _init() async {
@@ -243,11 +237,6 @@ class _PickupState extends State<Pickup> {
     formatted_address = data['result']['formatted_address'];
   }
 
-  Future<List<Accessory>> _getAccessories() async {
-    Accessories instance = Accessories("location-type");
-    return instance.getData();
-  }
-
   selected(selectedAddress) {
     if (selectedAddress.description != null) {
       setState(() {
@@ -255,5 +244,12 @@ class _PickupState extends State<Pickup> {
         addressDetails(selectedAddress.place_id);
       });
     }
+  }
+
+  _getLocationType() async {
+    List response = await getLocationType();
+    setState(() {
+      types = response;
+    });
   }
 }
