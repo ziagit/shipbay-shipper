@@ -39,7 +39,8 @@ dependencies:
   flutter_spinkit: ^4.1.2+1
   progress_indicators: ^0.1.5
   smooth_star_rating: 1.1.1
-  webview_flutter: ^1.0.7
+  flutter_html: ^0.8.2
+  email_validator: ^1.0.6
 
 dev_dependencies:
   flutter_test:
@@ -55,12 +56,18 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
-
+  
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/card.png
     - assets/images/coffeequery.png
     - assets/images/bg.png
+    - assets/images/inssured.png
+    - assets/images/nosignup.png
+    - assets/images/transparent.png
+    - assets/images/tingsapp.png
+    - assets/images/stack.png
+    - assets/images/tingsapp2.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
@@ -85,5 +92,19 @@ flutter:
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
   #
+  fonts:
+     - family: Open Sans
+       fonts:
+         - asset: assets/fonts/open-sans/OpenSans-Bold.ttf
+         - asset: assets/fonts/open-sans/OpenSans-BoldItalic.ttf
+         - asset: assets/fonts/open-sans/OpenSans-ExtraBold.ttf
+         - asset: assets/fonts/open-sans/OpenSans-ExtraBoldItalic.ttf
+         - asset: assets/fonts/open-sans/OpenSans-Italic.ttf
+         - asset: assets/fonts/open-sans/OpenSans-Light.ttf
+         - asset: assets/fonts/open-sans/OpenSans-LightItalic.ttf
+         - asset: assets/fonts/open-sans/OpenSans-Regular.ttf
+         - asset: assets/fonts/open-sans/OpenSans-Semibold.ttf
+         - asset: assets/fonts/open-sans/OpenSans-SemiboldItalic.ttf
+           style: italic
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
